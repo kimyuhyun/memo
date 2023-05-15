@@ -1,46 +1,31 @@
 import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getAccessToken, getRefreshToken } from "../utils/common";
+import { getAccessToken } from "../utils/common";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { isPossibleToken } from "../utils/store";
 
 export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [cateList, setCateList] = useState([]);
     const [list, setList] = useState([]);
 
     const cate = searchParams.get("cate") ?? "";
 
     useEffect(() => {
-        getCate();
-        if (cate !== "") {
-            getList();
-        }
+        getList();
     }, [cate]);
 
-    const getCate = async () => {
-        const { data } = await axios({
-            url: `${process.env.REACT_APP_HOST}/get_cate`,
-            method: "GET",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${getAccessToken()}`,
-            },
-        });
-
-        setCateList(data);
-        if (cate === "") {
-            navigate(`?cate=${data[0].idx}`);
-        }
-    };
-
     const getList = async () => {
+        if ((await isPossibleToken()) === -1) {
+            navigate("/login");
+            return;
+        }
         const { data } = await axios({
             url: `${process.env.REACT_APP_HOST}/get_list?cate=${cate}`,
             method: "GET",
@@ -49,7 +34,6 @@ export default () => {
                 Authorization: `Bearer ${getAccessToken()}`,
             },
         });
-
         setList(data);
     };
 
@@ -74,25 +58,10 @@ export default () => {
         }
     };
 
-    console.log(cate, cateList, list);
+    console.log(list);
 
     return (
         <div>
-            <ul className="nav nav-tabs">
-                {cateList.map((row, i) => (
-                    <li key={i} className="nav-item">
-                        <Link
-                            className={`nav-link ${row.idx == cate ? "active" : ""} tabs`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate(`?cate=${row.idx}`);
-                            }}
-                        >
-                            {row.name1}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
             <div className="float-start">
                 {list.map((row, i) => (
                     <div key={i} className="ms-2 mt-2 border shadow-sm float-start">
@@ -119,7 +88,7 @@ export default () => {
                             value={row.memo}
                             tabSize={4}
                             highlight={(code) => highlight(code, languages.js)}
-                            padding={20}
+                            padding={10}
                             style={{
                                 fontFamily: "monospace",
                                 fontSize: 14,
@@ -128,6 +97,8 @@ export default () => {
                     </div>
                 ))}
             </div>
+            <div className="float-start m-5"></div>
+            
 
             <div
                 className="position-fixed rounded-circle bg-dark rounded-circle d-flex align-items-center justify-content-center"

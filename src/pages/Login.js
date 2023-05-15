@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { setId, getId, setAccessToken, setRefreshToken } from "../utils/common";
+import { setId, getId, setAccessToken } from "../utils/common";
 import { useNavigate } from "react-router-dom";
 
 export default () => {
@@ -35,7 +35,6 @@ export default () => {
         console.log(data);
         if (data.code === 1) {
             setAccessToken(data.access_token);
-            setRefreshToken(data.refresh_token);
             setId(frm.email);
             navigate("/");
         } else {

@@ -2,10 +2,10 @@ import "./css/bootstrap.icons.css";
 import "./css/bootstrap5.3.0.css";
 import axios from "axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import List from "./pages/List";
+import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Write from "./pages/Write";
-import TokenTest from "./pages/TokenTest";
+import Setting from "./pages/Setting";
 import NotFound from "./pages/NotFound";
 import { getAccessToken, getRefreshToken, setAccessToken } from "./utils/common";
 import { useEffect } from "react";
@@ -53,18 +53,21 @@ export default () => {
     useEffect(() => {
         console.log(getAccessToken());
         if (getAccessToken() === null || getAccessToken() === "undefined") {
-            if (location.pathname !== "/login") {
+            if (location.pathname === "/login" || location.pathname === "/token_test") {
+                
+            } else {
                 navigate("/login");
+                return;
             }
         }
     }, []);
 
     return (
         <Routes>
-            <Route path="/" element={<List />}></Route>
+            <Route path="/" element={<Main />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/write" element={<Write />}></Route>
-            <Route path="/token_test" element={<TokenTest />}></Route>
+            <Route path="/setting" element={<Setting />}></Route>
             <Route path="*" element={<NotFound />}></Route>
         </Routes>
     );
