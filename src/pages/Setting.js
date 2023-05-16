@@ -183,7 +183,7 @@ const Card = ({ id, text, index, moveCard, modifyClick }) => {
         <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
             {index + 1}. {text}
             <button className="btn btn-link btn-sm" onClick={() => modifyClick(id, text)}>
-                <i class="bi bi-pencil"></i>
+                <i className="bi bi-pencil"></i>
             </button>
         </div>
     );

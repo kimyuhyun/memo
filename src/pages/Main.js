@@ -35,27 +35,38 @@ export default () => {
 
     return (
         <div>
-            <ul className="nav nav-tabs">
-                {cateList.map((row, i) => (
-                    <li key={i} className="nav-item">
-                        <Link
-                            className={`nav-link ${row.idx == cate ? "active" : ""} tabs`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate(`?cate=${row.idx}`);
-                            }}
-                        >
-                            {row.name1}
-                        </Link>
-                    </li>
-                ))}
-                <li className="nav-item">
-                    <Link className="nav-link tabs" to="/setting">
-                        <i class="bi bi-gear"></i>
-                    </Link>
-                </li>
-            </ul>
-            <List />
+            {cateList.length > 0 ? (
+                <>
+                    <ul className="nav nav-tabs">
+                        {cateList.map((row, i) => (
+                            <li key={i} className="nav-item">
+                                <Link
+                                    className={`nav-link ${row.idx == cate ? "active" : ""} tabs`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        navigate(`?cate=${row.idx}`);
+                                    }}
+                                >
+                                    {row.name1}
+                                </Link>
+                            </li>
+                        ))}
+                        <li className="nav-item">
+                            <Link className="nav-link tabs" to="/setting">
+                                <i className="bi bi-gear"></i>
+                            </Link>
+                        </li>
+                    </ul>
+                    <List />
+                </>
+            ) : (
+                <>
+                    <h3>다시 로그인 해주세요.</h3>
+                    <button className="btn btn-link" onClick={() => navigate("/login")}>
+                        Login
+                    </button>
+                </>
+            )}
         </div>
     );
 };
