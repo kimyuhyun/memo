@@ -77,16 +77,10 @@ export default () => {
         <div className="bg-white">
             <form id="frm1" onSubmit={handleSubmit}>
                 <div className="d-flex flex-row align-items-center">
-                    <button
-                        className="btn btn-light btn-lg me-auto m-3"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            navigate(-1);
-                        }}
-                    >
+                    <button className="btn btn-light btn-lg me-auto m-3" type="button" onClick={()=>navigate(-1)}>
                         <i className="bi bi-arrow-left"></i>
                     </button>
-                    <button className="btn btn-primary btn-lg m-3">
+                    <button className="btn btn-primary btn-lg m-3" type="submit">
                         <i className="bi bi-check-lg"></i>
                     </button>
                 </div>

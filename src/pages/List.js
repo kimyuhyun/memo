@@ -91,11 +91,11 @@ export default () => {
                                 </div>
                                 <div>
                                     <button className="btn btn-link" type="button" onClick={() => setPopupContent(row.memo)}>
-                                        <i class="bi bi-arrows-fullscreen"></i>
+                                        <i className="bi bi-arrows-fullscreen"></i>
                                     </button>
 
                                     <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
-                                        <i class="bi bi-three-dots-vertical"></i>
+                                        <i className="bi bi-three-dots-vertical"></i>
                                     </button>
                                 </div>
                             </div>
@@ -144,7 +144,7 @@ export default () => {
                         </Link>
                     </div>
                     <div>
-                        <button className="btn text-danger" onClick={() => handleDelete(contextMenu.idx)}>
+                        <button className="btn text-danger" type="button" onClick={() => handleDelete(contextMenu.idx)}>
                             <i className="bi bi-trash"></i> 삭제
                         </button>
                     </div>
@@ -152,19 +152,13 @@ export default () => {
             </div>
 
             {popupContent && (
-                <div class="modal bg-dark bg-opacity-50" style={{ display: "block" }}>
-                    <div class="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    onClick={() => {
-                                        setPopupContent("");
-                                    }}
-                                ></button>
+                <div className="modal bg-dark bg-opacity-50" style={{ display: "block" }}>
+                    <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="btn-close" onClick={() => setPopupContent("")}></button>
                             </div>
-                            <div class="modal-body p-0">
+                            <div className="modal-body p-0">
                                 <div className="border bg-white">
                                     <Editor
                                         onValueChange={(code) => {
