@@ -36,7 +36,7 @@ export default () => {
         if (data.code === 1) {
             setAccessToken(data.access_token);
             setId(frm.email);
-            navigate("/");
+            navigate("/Memo2");
         } else {
             alert(data.msg);
         }

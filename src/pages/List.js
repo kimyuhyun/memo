@@ -14,6 +14,8 @@ export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [list, setList] = useState([]);
+    const [popupContent, setPopupContent] = useState("");
+    const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
 
     const cate = searchParams.get("cate") ?? "";
 
@@ -23,7 +25,7 @@ export default () => {
 
     const getList = async () => {
         if ((await isPossibleToken()) === -1) {
-            navigate("/login");
+            navigate("/Memo2/login");
             return;
         }
         const { data } = await axios({
@@ -55,59 +57,134 @@ export default () => {
                 alert(data.msg);
             }
             getList();
+
+            setContextMenu({ ...contextMenu, isShow: "none" });
         }
+    };
+
+    const handleMenu = (e, idx) => {
+        e.preventDefault();
+        var isShow = "none";
+        if (contextMenu.isShow === "none") {
+            isShow = "block";
+        }
+
+        setContextMenu({
+            x: e.pageX - 60,
+            y: e.pageY + 20,
+            idx,
+            isShow,
+        });
     };
 
     console.log(list);
 
     return (
-        <div>
-            <div className="float-start">
+        <div className="container-fluid bg-white">
+            <div className="row">
                 {list.map((row, i) => (
-                    <div key={i} className="ms-2 mt-2 border shadow-sm float-start">
-                        <div className="bg-light border-bottom d-flex flex-row">
-                            <div className="d-flex flex-fill align-items-center ms-2">
-                                {row.title} {row.exp}
-                            </div>
-                            <div>
-                                <Link className="btn btn-link" to={`/write?idx=${row.idx}&cate=${cate}`}>
-                                    <i className="bi bi-pencil-square"></i>
-                                </Link>
+                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-4 mt-3">
+                        <div className="border shadow">
+                            <div className="bg-light border-bottom d-flex flex-row">
+                                <div className="d-flex flex-fill align-items-center ms-2">
+                                    {row.title} {row.exp}
+                                </div>
+                                <div>
+                                    <button className="btn btn-link" type="button" onClick={() => setPopupContent(row.memo)}>
+                                        <i class="bi bi-arrows-fullscreen"></i>
+                                    </button>
 
-                                <button className="btn btn-link text-danger" onClick={() => handleDelete(row.idx)}>
-                                    <i className="bi bi-trash"></i>
-                                </button>
+                                    <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                </div>
                             </div>
+                            <Editor
+                                onValueChange={(code) => {
+                                    const newList = [...list];
+                                    newList[i].memo = code;
+                                    setList(newList);
+                                }}
+                                value={row.memo}
+                                tabSize={4}
+                                highlight={(code) => highlight(code, languages.js)}
+                                padding={10}
+                                style={{
+                                    height: "300px",
+                                    fontFamily: "monospace",
+                                    fontSize: "12px",
+                                }}
+                            />
                         </div>
-                        <Editor
-                            onValueChange={(code) => {
-                                const newList = [...list];
-                                newList[i].memo = code;
-                                setList(newList);
-                            }}
-                            value={row.memo}
-                            tabSize={4}
-                            highlight={(code) => highlight(code, languages.js)}
-                            padding={10}
-                            style={{
-                                fontFamily: "monospace",
-                                fontSize: 14,
-                            }}
-                        />
                     </div>
                 ))}
+                <div className="m-5"></div>
+
+                <div
+                    className="position-fixed rounded-circle bg-dark rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "50px", height: "50px", right: "20px", bottom: "20px" }}
+                >
+                    <Link className="btn btn-dark rounded-circle" to={`/Memo2/write?cate=${cate}`}>
+                        <i className="bi bi-pencil-square"></i>
+                    </Link>
+                </div>
             </div>
-            <div className="float-start m-5"></div>
-            
 
             <div
-                className="position-fixed rounded-circle bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                style={{ width: "50px", height: "50px", right: "20px", bottom: "20px" }}
-            >
-                <Link className="btn btn-dark rounded-circle" to={`/write?cate=${cate}`}>
-                    <i className="bi bi-pencil-square"></i>
-                </Link>
+                className="position-fixed bg-dark bg-opacity-50"
+                style={{ width: "100vw", height: "100vh", left: 0, top: 0, display: contextMenu.isShow }}
+                onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
+            ></div>
+
+            <div className="position-absolute bg-white shadow-lg" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
+                <div className="border">
+                    <div className="border-bottom">
+                        <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
+                            <i className="bi bi-pencil-square"></i> 수정
+                        </Link>
+                    </div>
+                    <div>
+                        <button className="btn text-danger" onClick={() => handleDelete(contextMenu.idx)}>
+                            <i className="bi bi-trash"></i> 삭제
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            {popupContent && (
+                <div class="modal bg-dark bg-opacity-50" style={{ display: "block" }}>
+                    <div class="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    onClick={() => {
+                                        setPopupContent("");
+                                    }}
+                                ></button>
+                            </div>
+                            <div class="modal-body p-0">
+                                <div className="border bg-white">
+                                    <Editor
+                                        onValueChange={(code) => {
+                                            setPopupContent(code);
+                                        }}
+                                        value={popupContent}
+                                        tabSize={4}
+                                        highlight={(code) => highlight(code, languages.js)}
+                                        padding={10}
+                                        style={{
+                                            fontFamily: "monospace",
+                                            fontSize: "14px",
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

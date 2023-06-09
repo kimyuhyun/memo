@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAccessToken } from "./common";
+import { getAccessToken, setAccessToken } from "./common";
 
 export const isPossibleToken = async () => {
     const { data } = await axios({
@@ -10,5 +10,10 @@ export const isPossibleToken = async () => {
             Authorization: `Bearer ${getAccessToken()}`,
         },
     });
+
+    if (data.access_token) {
+        setAccessToken(data.access_token);
+    }
+
     return data.code;
 };

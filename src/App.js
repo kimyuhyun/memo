@@ -53,10 +53,10 @@ export default () => {
     useEffect(() => {
         console.log(getAccessToken());
         if (getAccessToken() === null || getAccessToken() === "undefined") {
-            if (location.pathname === "/login" || location.pathname === "/token_test") {
+            if (location.pathname === "/Memo2/login") {
                 
             } else {
-                navigate("/login");
+                navigate("/Memo2/login");
                 return;
             }
         }
@@ -64,10 +64,10 @@ export default () => {
 
     return (
         <Routes>
-            <Route path="/" element={<Main />}></Route>
-            <Route path="/login" element={<Login />}></Route>
-            <Route path="/write" element={<Write />}></Route>
-            <Route path="/setting" element={<Setting />}></Route>
+            <Route path="/Memo2" element={<Main />}></Route>
+            <Route path="/Memo2/login" element={<Login />}></Route>
+            <Route path="/Memo2/write" element={<Write />}></Route>
+            <Route path="/Memo2/setting" element={<Setting />}></Route>
             <Route path="*" element={<NotFound />}></Route>
         </Routes>
     );

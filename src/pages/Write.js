@@ -22,14 +22,14 @@ export default () => {
     useEffect(() => {
         (async () => {
             if ((await isPossibleToken()) === -1) {
-                navigate("/login");
+                navigate("/Memo2/login");
                 return;
             }
         })();
 
         if (cate === "") {
             alert("카테고리를 선택해주세요.");
-            navigate("/");
+            navigate("/Memo2");
         }
 
         if (idx !== "") {
@@ -74,13 +74,19 @@ export default () => {
     };
 
     return (
-        <div>
+        <div className="bg-white">
             <form id="frm1" onSubmit={handleSubmit}>
                 <div className="d-flex flex-row align-items-center">
-                    <button className="btn btn-light btn-lg me-auto m-1" onClick={(e) => navigate(-1)}>
+                    <button
+                        className="btn btn-light btn-lg me-auto m-3"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate(-1);
+                        }}
+                    >
                         <i className="bi bi-arrow-left"></i>
                     </button>
-                    <button className="btn btn-primary btn-lg m-1">
+                    <button className="btn btn-primary btn-lg m-3">
                         <i className="bi bi-check-lg"></i>
                     </button>
                 </div>
@@ -90,13 +96,10 @@ export default () => {
                 <input type="hidden" name="table" value="MEMO_ARTICLE_tbl" />
 
                 <div className="mb-3 mx-3">
-                    <label className="form-label">제목을 입력해주세요.</label>
                     <input type="text" className="border form-control" required value={title} onChange={(e) => setTitle(e.target.value)} />
                 </div>
 
                 <div className="mb-3 mx-3 pb-5">
-                    <label className="form-label">내용을 입력해주세요.</label>
-
                     <Editor
                         className="form-control flex-fill"
                         onValueChange={(code) => {

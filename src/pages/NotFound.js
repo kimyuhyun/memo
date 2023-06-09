@@ -11,7 +11,7 @@ export default () => {
                         <span className="text-danger">Opps!</span> Page not found.
                     </p>
                     <p className="lead">The page you’re looking for doesn’t exist.</p>
-                    <a href="/" className="btn btn-primary">
+                    <a href="/Memo2" className="btn btn-primary">
                         Go Home
                     </a>
                 </div>
