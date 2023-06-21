@@ -77,6 +77,16 @@ export default () => {
         });
     };
 
+    const handlePopup = (e) => {
+        if (typeof e === "object") {
+            if (e.target.id === "backdrop") {
+                setPopupContent("");
+            }
+        } else {
+            setPopupContent(e);
+        }
+    };
+
     console.log(list);
 
     return (
@@ -90,7 +100,7 @@ export default () => {
                                     {row.title} {row.exp}
                                 </div>
                                 <div>
-                                    <button className="btn btn-link" type="button" onClick={() => setPopupContent(row.memo)}>
+                                    <button className="btn btn-link" type="button" onClick={() => handlePopup(row.memo)}>
                                         <i className="bi bi-arrows-fullscreen"></i>
                                     </button>
 
@@ -100,11 +110,8 @@ export default () => {
                                 </div>
                             </div>
                             <Editor
-                                onValueChange={(code) => {
-                                    const newList = [...list];
-                                    newList[i].memo = code;
-                                    setList(newList);
-                                }}
+                                onClick={() => handlePopup(row.memo)}
+                                readOnly={true}
                                 value={row.memo}
                                 tabSize={4}
                                 highlight={(code) => highlight(code, languages.js)}
@@ -152,11 +159,11 @@ export default () => {
             </div>
 
             {popupContent && (
-                <div className="modal bg-dark bg-opacity-50" style={{ display: "block" }}>
+                <div className="modal bg-dark bg-opacity-50" style={{ display: "block" }} id="backdrop" onClick={(e) => handlePopup(e)}>
                     <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <button type="button" className="btn-close" onClick={() => setPopupContent("")}></button>
+                                <button type="button" className="btn-close" onClick={() => handlePopup("")}></button>
                             </div>
                             <div className="modal-body p-0">
                                 <div className="border bg-white">
