@@ -36,10 +36,10 @@ export default () => {
     };
 
     return (
-        <div className="bg-light pt-4">
+        <div className="pt-1">
             {cateList.length > 0 ? (
                 <>
-                    <ul className="nav nav-tabs">
+                    <ul className="nav nav-underline">
                         {cateList.map((row, i) => (
                             <li key={i} className="nav-item">
                                 <Link

@@ -90,19 +90,24 @@ export default () => {
     console.log(list);
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid bg-white">
             <div className="row">
                 {list.map((row, i) => (
-                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-3 mt-3">
-                        <div className="d-flex flex-column border shadow-sm bg-white" style={{ height: "200px" }}>
-                            <div className="d-flex flex-row border-bottom bg-light">
-                                <div className="d-flex flex-fill align-items-center ms-2 fw-bold">
+                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-4 mt-3">
+                        <div className="border shadow">
+                            <div className="bg-light border-bottom d-flex flex-row">
+                                <div className="d-flex flex-fill align-items-center ms-2">
                                     {row.title} {row.exp}
                                 </div>
+                                <div>
+                                    <button className="btn btn-link" type="button" onClick={() => handlePopup(row.memo)}>
+                                        <i className="bi bi-arrows-fullscreen"></i>
+                                    </button>
 
-                                <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
-                                    <i className="bi bi-three-dots-vertical"></i>
-                                </button>
+                                    <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
+                                        <i className="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                </div>
                             </div>
                             <Editor
                                 onClick={() => handlePopup(row.memo)}
@@ -112,7 +117,7 @@ export default () => {
                                 highlight={(code) => highlight(code, languages.js)}
                                 padding={10}
                                 style={{
-                                    height: "100%",
+                                    maxHeight: "300px",
                                     fontFamily: "monospace",
                                     fontSize: "12px",
                                 }}
@@ -169,11 +174,10 @@ export default () => {
                                         value={popupContent}
                                         tabSize={4}
                                         highlight={(code) => highlight(code, languages.js)}
-                                        padding={10}
+                                        padding={15}
                                         style={{
-                                            minHeight: "500px",
                                             fontFamily: "monospace",
-                                            fontSize: "12px",
+                                            fontSize: "14px",
                                         }}
                                     />
                                 </div>
