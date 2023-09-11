@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getAccessToken } from "../utils/common";
+import { getAccessToken, getId, getRefreshToken } from "../utils/common";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
@@ -14,23 +14,28 @@ import PopupContent from "./PopupContent";
 export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const keyword = searchParams.get("keyword") ?? "";
     const [list, setList] = useState([]);
+    const [cate, setCate] = useState("");
     const [detail, setDetail] = useState(null);
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
 
-    const cate = searchParams.get("cate") ?? "";
-
     useEffect(() => {
-        getList();
-    }, [cate]);
+        (async () => {
+            if ((await isPossibleToken()) === -1) {
+                navigate("/Memo2/login");
+                return;
+            }
+        })();
 
-    const getList = async () => {
-        if ((await isPossibleToken()) === -1) {
-            navigate("/Memo2/login");
-            return;
+        if (keyword !== "") {
+            getSearchResult();
         }
+    }, []);
+
+    const getSearchResult = async () => {
         const { data } = await axios({
-            url: `${process.env.REACT_APP_HOST}/get_list?cate=${cate}`,
+            url: `${process.env.REACT_APP_HOST}/search?keyword=${keyword}`,
             method: "GET",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -57,14 +62,13 @@ export default () => {
             if (data.code === 0) {
                 alert(data.msg);
             }
-            getList();
+            getSearchResult();
 
             setContextMenu({ ...contextMenu, isShow: "none" });
         }
     };
 
     const handleMenu = (e, idx) => {
-        console.log("handleMenu", e);
         e.preventDefault();
         var isShow = "none";
         if (contextMenu.isShow === "none") {
@@ -83,6 +87,10 @@ export default () => {
 
     return (
         <div className="container-fluid">
+            <button className="btn btn-light btn-lg me-auto mt-2" onClick={(e) => navigate(-1)}>
+                <i className="bi bi-arrow-left"></i>
+            </button>
+
             <div className="row">
                 {list.map((row, i) => (
                     <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-3 mt-3">
@@ -92,7 +100,14 @@ export default () => {
                                     {row.title} {row.exp}
                                 </div>
 
-                                <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
+                                <button
+                                    className="btn text-dark"
+                                    type="button"
+                                    onClick={(e) => {
+                                        handleMenu(e, row.idx);
+                                        setCate(row.cate);
+                                    }}
+                                >
                                     <i className="bi bi-three-dots-vertical"></i>
                                 </button>
                             </div>
@@ -113,15 +128,6 @@ export default () => {
                     </div>
                 ))}
                 <div className="m-5"></div>
-
-                <div
-                    className="position-fixed rounded-circle bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                    style={{ width: "50px", height: "50px", right: "20px", bottom: "20px" }}
-                >
-                    <Link className="btn btn-dark rounded-circle" to={`/Memo2/write?cate=${cate}`}>
-                        <i className="bi bi-pencil-square"></i>
-                    </Link>
-                </div>
             </div>
 
             <div
@@ -130,8 +136,8 @@ export default () => {
                 onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
             ></div>
 
-            <div className="position-absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
-                <div className="border rounded bg-white shadow-lg">
+            <div className="position-absolute bg-white shadow-lg" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
+                <div className="border">
                     <div className="border-bottom">
                         <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
                             <i className="bi bi-pencil-square"></i> 수정
@@ -145,7 +151,7 @@ export default () => {
                 </div>
             </div>
 
-            {detail && <PopupContent detail={detail} setDetail={setDetail} setRefresh={getList} />}
+            {detail && <PopupContent detail={detail} setDetail={setDetail} setRefresh={getSearchResult} />}
         </div>
     );
 };

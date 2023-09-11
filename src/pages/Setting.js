@@ -135,13 +135,7 @@ export default () => {
     return (
         <div>
             <div className="d-flex flex-row align-items-center">
-                <button
-                    className="btn btn-light btn-lg me-auto m-3"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        navigate(-1);
-                    }}
-                >
+                <button className="btn btn-light btn-lg me-auto m-3" onClick={(e) => navigate(-1)}>
                     <i className="bi bi-arrow-left"></i>
                 </button>
                 <button className="btn btn-primary btn-lg m-3" onClick={handleSave}>

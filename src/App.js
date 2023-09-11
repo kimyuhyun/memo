@@ -5,6 +5,7 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Write from "./pages/Write";
+import SearchResult from "./pages/SearchResult";
 import Setting from "./pages/Setting";
 import NotFound from "./pages/NotFound";
 import { getAccessToken, getRefreshToken, setAccessToken } from "./utils/common";
@@ -54,7 +55,6 @@ export default () => {
         console.log(getAccessToken());
         if (getAccessToken() === null || getAccessToken() === "undefined") {
             if (location.pathname === "/Memo2/login") {
-                
             } else {
                 navigate("/Memo2/login");
                 return;
@@ -67,6 +67,7 @@ export default () => {
             <Route path="/Memo2" element={<Main />}></Route>
             <Route path="/Memo2/login" element={<Login />}></Route>
             <Route path="/Memo2/write" element={<Write />}></Route>
+            <Route path="/Memo2/search" element={<SearchResult />}></Route>
             <Route path="/Memo2/setting" element={<Setting />}></Route>
             <Route path="*" element={<NotFound />}></Route>
         </Routes>
