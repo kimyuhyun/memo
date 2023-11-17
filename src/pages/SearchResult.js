@@ -76,8 +76,8 @@ export default () => {
         }
 
         setContextMenu({
-            x: e.pageX - 60,
-            y: e.pageY + 20,
+            x: e.pageX,
+            y: e.pageY,
             idx,
             isShow,
         });
@@ -91,10 +91,10 @@ export default () => {
                 <i className="bi bi-arrow-left"></i>
             </button>
 
-            <div className="row">
+            <div className="row pe-1">
                 {list.map((row, i) => (
-                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-3 mt-3">
-                        <div className="d-flex flex-column border shadow-sm bg-white" style={{ height: "200px" }}>
+                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-2 mt-1 ps-1 pe-0">
+                        <div className="d-flex flex-column border bg-white" style={{ height: "200px" }}>
                             <div className="d-flex flex-row border-bottom bg-light">
                                 <div className="d-flex flex-fill align-items-center ms-2 fw-bold">
                                     {row.title} {row.exp}
@@ -136,8 +136,8 @@ export default () => {
                 onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
             ></div>
 
-            <div className="position-absolute bg-white shadow-lg" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
-                <div className="border">
+            <div className="position-absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
+                <div className="border rounded bg-white shadow-lg">
                     <div className="border-bottom">
                         <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
                             <i className="bi bi-pencil-square"></i> 수정
