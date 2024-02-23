@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
 // 응답 인터셉터 추가
 axios.interceptors.response.use(
     async (res) => {
-        console.log("QWEQWE", res);
+        // console.log(res);
         if (res.data.code === -1) {
             // window.location.href = "/login";
         } else if (res.data.code === 100) {

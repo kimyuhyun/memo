@@ -129,7 +129,17 @@ export default () => {
         );
     }, []);
     const renderCard = useCallback((card, index, modifyClick, deleteClick) => {
-        return <Card key={card.idx} index={index} id={card.idx} text={card.name1} moveCard={moveCard} modifyClick={modifyClick} deleteClick={handleDelete} />;
+        return (
+            <Card
+                key={card.idx}
+                index={index}
+                id={card.idx}
+                text={card.name1}
+                moveCard={moveCard}
+                modifyClick={modifyClick}
+                deleteClick={handleDelete}
+            />
+        );
     }, []);
 
     return (
@@ -142,23 +152,23 @@ export default () => {
                     <i className="bi bi-check-lg"></i>
                 </button>
             </div>
-            <div className="p-3">
+            <div className="p-3 w-50 container">
                 <DndProvider backend={HTML5Backend}>
                     <div>{cards.map((card, i) => renderCard(card, i, handleModify, handleDelete))}</div>
                 </DndProvider>
-            </div>
 
-            <button className="btn btn-primary m-3" onClick={handleAdd}>
-                카테고리추가
-            </button>
+                <button className="btn btn-primary my-3" onClick={handleAdd}>
+                    카테고리추가
+                </button>
+            </div>
         </div>
     );
 };
 
 const style = {
-    border: "1px dashed gray",
-    padding: "0.5rem 1rem",
-    marginBottom: ".5rem",
+    border: "1px dashed #CCC",
+    padding: "6px",
+    marginBottom: "5px",
     backgroundColor: "white",
     cursor: "move",
 };
@@ -224,7 +234,7 @@ const Card = ({ id, text, index, moveCard, modifyClick, deleteClick }) => {
     return (
         <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
             {index + 1}. {text}
-            <button className="btn btn-link btn-sm" onClick={() => modifyClick(id, text)}>
+            <button className="btn btn-link btn-sm ms-2" onClick={() => modifyClick(id, text)}>
                 <i className="bi bi-pencil"></i>
             </button>
             <button className="btn btn-link text-danger btn-sm" onClick={() => deleteClick(id)}>

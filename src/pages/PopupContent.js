@@ -14,9 +14,15 @@ var closeReadyMillSec = 0;
 export default ({ detail, setDetail, setRefresh }) => {
     const editorRef = useRef(null);
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
+    const [isStar, setStar] = useState(false);
 
     useEffect(() => {
         editorRef.current._input.focus();
+        if (detail.is_fav == 1) {
+            setStar(true);
+        } else {
+            setStar(false);
+        }
     }, []);
 
     const handleMenu = (e) => {
@@ -87,6 +93,31 @@ export default ({ detail, setDetail, setRefresh }) => {
         }
     };
 
+    async function setFav(idx) {
+        console.log("setFav", idx);
+
+        //유용한놈!
+        const frm = {};
+        frm.idx = idx;
+        const { data } = await axios({
+            url: `${process.env.REACT_APP_HOST}/set_fav`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Bearer ${getAccessToken()}`,
+            },
+            data: frm,
+        });
+
+        if (data.is_fav == 1) {
+            setStar(true);
+        } else {
+            setStar(false);
+        }
+        
+        setRefresh();
+    }
+
     return (
         <>
             <div
@@ -103,6 +134,14 @@ export default ({ detail, setDetail, setRefresh }) => {
                             <button className="btn btn-sm text-dark" type="button" onClick={(e) => handleMenu(e)}>
                                 <i className="bi bi-three-dots-vertical"></i>
                             </button>
+
+                            <div
+                                className="ms-1 d-flex align-items-center"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => setFav(detail.idx, detail.is_fav)}
+                            >
+                                <i className={`bi bi-star${isStar ? "-fill text-warning" : ""}`}></i>
+                            </div>
 
                             <button type="button" className="btn-close" onClick={() => setDetail(null)}></button>
                         </div>
@@ -133,10 +172,16 @@ export default ({ detail, setDetail, setRefresh }) => {
                 </div>
             </div>
 
-            <div className="position-absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow, zIndex: 9999 }}>
+            <div
+                className="position-absolute"
+                style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow, zIndex: 9999 }}
+            >
                 <div className="border rounded bg-white shadow-lg">
                     <div className="border-bottom">
-                        <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}`}>
+                        <Link
+                            className="btn text-primary"
+                            to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}`}
+                        >
                             <i className="bi bi-pencil-square"></i> 수정
                         </Link>
                     </div>

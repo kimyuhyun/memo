@@ -6,13 +6,13 @@ import { getAccessToken } from "../utils/common";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import Write from "./Write";
+import SearchPopup from "./SearchPopup";
 
 export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [cateList, setCateList] = useState([]);
     const [isSearchPopup, setIsSearchPopup] = useState(false);
-    const inputSearchEl = useRef();
     const cate = searchParams.get("cate") ?? "";
     const idx = searchParams.get("idx") ?? "";
 
@@ -40,7 +40,7 @@ export default () => {
     const handleOnKeyPress = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            navigate(`/Memo2/search?keyword=${inputSearchEl.current.value}`);
+            navigate(`/Memo2/search?keyword=${e.target.value}`);
             setIsSearchPopup(false);
         }
     };
@@ -49,11 +49,25 @@ export default () => {
         <>
             {cateList.length > 0 ? (
                 <>
-                    <ul className="nav nav-underline nav-fill">
+                    <ul className="nav nav-pills mt-1 ms-1">
+                        <li className="nav-item">
+                            <a
+                                className="nav-link"
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setIsSearchPopup(!isSearchPopup);
+                                }}
+                            >
+                                <i className="bi bi-search"></i>
+                            </a>
+                        </li>
+
                         {cateList.map((row, i) => (
-                            <li key={i} className="nav-item ms-2">
+                            <li key={i} className="nav-item">
                                 <Link
-                                    className={`nav-link ${row.idx == cate ? "active" : ""} tabs`}
+                                    className={`nav-link ${row.idx == cate ? "active" : ""}`}
+                                    style={{ fontSize: "14px" }}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setIsSearchPopup(false);
@@ -69,23 +83,6 @@ export default () => {
                                 <i className="bi bi-gear"></i>
                             </Link>
                         </li>
-
-                        <li className="nav-item">
-                            <a
-                                className="nav-link tabs"
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setIsSearchPopup(!isSearchPopup);
-                                    setTimeout(() => {
-                                        inputSearchEl.current.value = "";
-                                        inputSearchEl.current.focus();
-                                    }, 100);
-                                }}
-                            >
-                                <i className="bi bi-search"></i>
-                            </a>
-                        </li>
                     </ul>
                     {idx !== "" ? <Write /> : <List />}
                 </>
@@ -100,9 +97,7 @@ export default () => {
                 </div>
             )}
 
-            <div className={`${isSearchPopup ? "d-block" : "d-none"} position-fixed top-50 start-50 translate-middle w-75`} style={{ zIndex: "9999" }}>
-                <input ref={inputSearchEl} onKeyPress={handleOnKeyPress} type="text" className="form-control form-control-lg shadow-lg" placeholder="검색어를 입력해주세요." />
-            </div>
+            {isSearchPopup && <SearchPopup setIsSearchPopup={setIsSearchPopup} handleOnKeyPress={handleOnKeyPress} />}
         </>
     );
 };

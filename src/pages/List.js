@@ -20,6 +20,8 @@ export default () => {
 
     const cate = searchParams.get("cate") ?? "";
 
+    console.log(list);
+
     useEffect(() => {
         getList();
     }, [cate]);
@@ -79,7 +81,25 @@ export default () => {
         });
     };
 
-    console.log(list);
+    async function setFav(idx) {
+        console.log("setFav", idx);
+
+        //유용한놈!
+        const frm = {};
+        frm.idx = idx;
+        const { data } = await axios({
+            url: `${process.env.REACT_APP_HOST}/set_fav`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Bearer ${getAccessToken()}`,
+            },
+            data: frm,
+        });
+        console.log(data);
+
+        getList();
+    }
 
     return (
         <div className="container-fluid">
@@ -88,7 +108,17 @@ export default () => {
                     <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-2 mt-1 ps-1 pe-0">
                         <div className="d-flex flex-column border bg-white" style={{ height: "140px" }}>
                             <div className="d-flex flex-row border-bottom bg-light">
-                                <div className="d-flex flex-fill align-items-center ms-2 fw-bold" style={{ fontSize: "14px" }}>
+                                <div
+                                    className="ms-1 d-flex align-items-center"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => setFav(row.idx, row.is_fav)}
+                                >
+                                    <i className={`bi bi-star${row.is_fav == 0 ? "" : "-fill text-warning"}`}></i>
+                                </div>
+                                <div
+                                    className="d-flex flex-fill align-items-center ms-1 fw-bold"
+                                    style={{ fontSize: "14px" }}
+                                >
                                     {row.title} {row.exp}
                                 </div>
 
@@ -130,7 +160,10 @@ export default () => {
                 onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
             ></div>
 
-            <div className="position-absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
+            <div
+                className="position-absolute"
+                style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}
+            >
                 <div className="border rounded bg-white shadow-lg">
                     <div className="border-bottom">
                         <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
