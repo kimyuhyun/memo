@@ -23,6 +23,7 @@ export default () => {
     // console.log(list);
 
     useEffect(() => {
+        setFilter("");
         getList();
     }, [cate]);
 
@@ -123,11 +124,12 @@ export default () => {
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                         />
-                        <button 
+                        <button
                             className="btn border border-start-0 bg-dark"
-                            style={{zIndex: "0"}}
-                            type="button" 
-                            onClick={() => setFilter("")}>
+                            style={{ zIndex: "0" }}
+                            type="button"
+                            onClick={() => setFilter("")}
+                        >
                             <i className="bi bi-x-lg text-white"></i>
                         </button>
                     </div>
