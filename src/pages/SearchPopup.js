@@ -17,7 +17,7 @@ function SearchPopup({ setIsSearchPopup, handleOnKeyPress }) {
     };
 
     return (
-        <div className="modal bg-dark bg-opacity-50" style={{ display: "block" }} id="backdrop" onDoubleClick={(e) => handleDoubleClick(e)}>
+        <div className="modal bg-white bg-opacity-25" style={{ display: "block" }} id="backdrop" onDoubleClick={(e) => handleDoubleClick(e)}>
             <div className="w-75 mx-auto mt-5 pt-5">
                 <input
                     type="text"

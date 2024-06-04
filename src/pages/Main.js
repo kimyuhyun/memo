@@ -8,6 +8,7 @@ import { isPossibleToken } from "../utils/store";
 import Write from "./Write";
 import SearchPopup from "./SearchPopup";
 
+
 export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -83,6 +84,12 @@ export default () => {
                                 <i className="bi bi-gear"></i>
                             </Link>
                         </li>
+
+                        <li className="nav-item">
+                            <Link className="nav-link tabs" to="/Memo2/file_room">
+                                <i className="bi bi-hdd"></i>
+                            </Link>
+                        </li>
                     </ul>
                     {idx !== "" ? <Write /> : <List />}
                 </>
@@ -98,6 +105,7 @@ export default () => {
             )}
 
             {isSearchPopup && <SearchPopup setIsSearchPopup={setIsSearchPopup} handleOnKeyPress={handleOnKeyPress} />}
+            
         </>
     );
 };

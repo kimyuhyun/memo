@@ -8,6 +8,7 @@ import Write from "./pages/Write";
 import SearchResult from "./pages/SearchResult";
 import Setting from "./pages/Setting";
 import NotFound from "./pages/NotFound";
+import FileRoom from "./pages/FileRoom";
 import { getAccessToken, getRefreshToken, setAccessToken } from "./utils/common";
 import { useEffect } from "react";
 
@@ -69,6 +70,7 @@ export default () => {
             <Route path="/Memo2/write" element={<Write />}></Route>
             <Route path="/Memo2/search" element={<SearchResult />}></Route>
             <Route path="/Memo2/setting" element={<Setting />}></Route>
+            <Route path="/Memo2/file_room" element={<FileRoom />}></Route>
             <Route path="*" element={<NotFound />}></Route>
         </Routes>
     );

@@ -5,8 +5,6 @@ import { getAccessToken } from "../utils/common";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
-import "prismjs/themes/prism.css";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import PopupContent from "./PopupContent";
@@ -14,17 +12,29 @@ import PopupContent from "./PopupContent";
 export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [originList, setOriginList] = useState([]);
     const [list, setList] = useState([]);
     const [detail, setDetail] = useState(null);
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
+    const [filter, setFilter] = useState("");
 
     const cate = searchParams.get("cate") ?? "";
 
-    console.log(list);
+    // console.log(list);
 
     useEffect(() => {
         getList();
     }, [cate]);
+
+    useEffect(() => {
+        const filteredList = originList.filter((row) => {
+            return (
+                row.title.toLowerCase().indexOf(filter.toLowerCase()) > -1 ||
+                row.memo.toLowerCase().indexOf(filter.toLowerCase()) > -1
+            );
+        });
+        setList(filteredList);
+    }, [filter]);
 
     const getList = async () => {
         if ((await isPossibleToken()) === -1) {
@@ -40,6 +50,7 @@ export default () => {
             },
         });
         setList(data);
+        setOriginList(data);
     };
 
     const handleDelete = async (idx) => {
@@ -103,11 +114,31 @@ export default () => {
 
     return (
         <div className="container-fluid">
+            <div className="row pt-3 pb-1">
+                <div className="col-12 col-md-6 col-lg-6 col-xl-4 mt-1 ps-1 pe-1">
+                    <div className="input-group flex-nowrap">
+                        <input
+                            type="text"
+                            className="form-control form-control-sm border-end-0 bg-dark text-white"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                        />
+                        <button 
+                            className="btn border border-start-0 bg-dark"
+                            style={{zIndex: "0"}}
+                            type="button" 
+                            onClick={() => setFilter("")}>
+                            <i className="bi bi-x-lg text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div className="row pe-1">
                 {list.map((row, i) => (
                     <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-2 mt-1 ps-1 pe-0">
-                        <div className="d-flex flex-column border bg-white" style={{ height: "140px" }}>
-                            <div className="d-flex flex-row border-bottom bg-light">
+                        <div className="d-flex flex-column border" style={{ height: "140px" }}>
+                            <div className="d-flex flex-row border-bottom bg-dark">
                                 <div
                                     className="ms-1 d-flex align-items-center"
                                     style={{ cursor: "pointer" }}
@@ -122,7 +153,7 @@ export default () => {
                                     {row.title} {row.exp}
                                 </div>
 
-                                <button className="btn text-dark" type="button" onClick={(e) => handleMenu(e, row.idx)}>
+                                <button className="btn" type="button" onClick={(e) => handleMenu(e, row.idx)}>
                                     <i className="bi bi-three-dots-vertical"></i>
                                 </button>
                             </div>
@@ -164,7 +195,7 @@ export default () => {
                 className="position-absolute"
                 style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}
             >
-                <div className="border rounded bg-white shadow-lg">
+                <div className="border rounded bg-dark shadow-lg">
                     <div className="border-bottom">
                         <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
                             <i className="bi bi-pencil-square"></i> 수정

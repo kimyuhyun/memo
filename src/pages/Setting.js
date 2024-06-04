@@ -62,40 +62,44 @@ export default () => {
 
     const handleAdd = async () => {
         const newName1 = prompt("", "");
-        const { data } = await axios({
-            url: `${process.env.REACT_APP_HOST}/write`,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${getAccessToken()}`,
-            },
-            data: {
-                name1: newName1,
-                table: "MEMO_CATE_tbl",
-            },
-        });
-        console.log(data);
-        getCate();
+        if (newName1 != null) {
+            const { data } = await axios({
+                url: `${process.env.REACT_APP_HOST}/write`,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization: `Bearer ${getAccessToken()}`,
+                },
+                data: {
+                    name1: newName1,
+                    table: "MEMO_CATE_tbl",
+                },
+            });
+            console.log(data);
+            getCate();
+        }
     };
 
     const handleModify = async (idx, name1) => {
         const newName1 = prompt("", name1);
 
-        const { data } = await axios({
-            url: `${process.env.REACT_APP_HOST}/write`,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${getAccessToken()}`,
-            },
-            data: {
-                idx,
-                name1: newName1,
-                table: "MEMO_CATE_tbl",
-            },
-        });
-        console.log(data);
-        getCate();
+        if (newName1 != null) {
+            const { data } = await axios({
+                url: `${process.env.REACT_APP_HOST}/write`,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization: `Bearer ${getAccessToken()}`,
+                },
+                data: {
+                    idx,
+                    name1: newName1,
+                    table: "MEMO_CATE_tbl",
+                },
+            });
+            console.log(data);
+            getCate();
+        }
     };
 
     const handleDelete = async (idx) => {
@@ -145,7 +149,7 @@ export default () => {
     return (
         <div>
             <div className="d-flex flex-row align-items-center">
-                <button className="btn btn-light btn-lg me-auto m-3" onClick={(e) => navigate(-1)}>
+                <button className="btn btn-lg me-auto m-3" onClick={(e) => navigate(-1)}>
                     <i className="bi bi-arrow-left"></i>
                 </button>
                 <button className="btn btn-primary btn-lg m-3" onClick={handleSave}>
@@ -169,7 +173,6 @@ const style = {
     border: "1px dashed #CCC",
     padding: "6px",
     marginBottom: "5px",
-    backgroundColor: "white",
     cursor: "move",
 };
 

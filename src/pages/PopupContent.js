@@ -114,14 +114,14 @@ export default ({ detail, setDetail, setRefresh }) => {
         } else {
             setStar(false);
         }
-        
+
         setRefresh();
     }
 
     return (
         <>
             <div
-                className="modal bg-dark bg-opacity-50"
+                className="modal bg-white bg-opacity-25"
                 style={{ display: "block" }}
                 id="backdrop"
                 onClick={() => closeContextMenu()}
@@ -130,26 +130,27 @@ export default ({ detail, setDetail, setRefresh }) => {
             >
                 <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content">
-                        <div className="modal-header py-2">
-                            <button className="btn btn-sm text-dark" type="button" onClick={(e) => handleMenu(e)}>
+                        <div className="modal-header p-0 bg-dark">
+                            <button className="btn" type="button" onClick={(e) => handleMenu(e)}>
                                 <i className="bi bi-three-dots-vertical"></i>
                             </button>
 
                             <div
-                                className="ms-1 d-flex align-items-center"
+                                className="ms-3 d-flex align-items-center"
                                 style={{ cursor: "pointer" }}
                                 onClick={() => setFav(detail.idx, detail.is_fav)}
                             >
                                 <i className={`bi bi-star${isStar ? "-fill text-warning" : ""}`}></i>
                             </div>
 
-                            <button type="button" className="btn-close" onClick={() => setDetail(null)}></button>
+                            <button type="button" className="btn-close me-1" onClick={() => setDetail(null)}></button>
                         </div>
 
                         <div className="modal-body p-0">
-                            <div className="border bg-white border-top-0">
+                            <div className="border bg-dark-subtle border-top-0">
                                 <Editor
                                     ref={editorRef}
+                                    readOnly={true}
                                     onValueChange={(code) => {
                                         setDetail({
                                             ...detail,
@@ -176,7 +177,7 @@ export default ({ detail, setDetail, setRefresh }) => {
                 className="position-absolute"
                 style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow, zIndex: 9999 }}
             >
-                <div className="border rounded bg-white shadow-lg">
+                <div className="border rounded bg-dark shadow-lg">
                     <div className="border-bottom">
                         <Link
                             className="btn text-primary"
