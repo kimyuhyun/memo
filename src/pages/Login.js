@@ -44,8 +44,8 @@ export default () => {
 
     return (
         <>
-            <div className="login bg-light">
-                <form id="frm1" className="form-signin text-center bg-white p-4 shadow" onSubmit={(e) => handleSubmit(e)}>
+            <div className="login">
+                <form id="frm1" className="form-signin text-center p-4 shadow" onSubmit={(e) => handleSubmit(e)}>
                     <h1 className="h3 mb-3 font-weight-normal">
                         <i className="bi bi-door-open"></i> Login
                     </h1>

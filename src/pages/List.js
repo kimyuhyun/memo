@@ -2,12 +2,29 @@ import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getAccessToken } from "../utils/common";
-import Editor from "react-simple-code-editor";
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
+// import Editor from "react-simple-code-editor";
+// import { highlight, languages } from "prismjs/components/prism-core";
+// import "prismjs/components/prism-clike";
+
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { EditorView } from "@codemirror/view";
+
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import PopupContent from "./PopupContent";
+
+const customEditorStyle = EditorView.theme({
+    ".cm-scroller": {
+        overflow: "hidden !important", // 스크롤 완전 제거
+    },
+    ".cm-content": {
+        height: "120px",
+        fontFamily: "monospace",
+        fontSize: "12px",
+        backgroundColor: "#000000", // 원하는 배경색
+    },
+});
 
 export default () => {
     const navigate = useNavigate();
@@ -139,8 +156,8 @@ export default () => {
             <div className="row pe-1">
                 {list.map((row, i) => (
                     <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-2 mt-1 ps-1 pe-0">
-                        <div className="d-flex flex-column border" style={{ height: "140px" }}>
-                            <div className="d-flex flex-row border-bottom bg-dark">
+                        <div className="d-flex flex-column border">
+                            <div className="d-flex flex-row border-bottom bg-dark" style={{ height: "50px" }}>
                                 <div
                                     className="ms-1 d-flex align-items-center"
                                     style={{ cursor: "pointer" }}
@@ -159,18 +176,21 @@ export default () => {
                                     <i className="bi bi-three-dots-vertical"></i>
                                 </button>
                             </div>
-                            <Editor
+
+                            <CodeMirror
                                 onClick={() => setDetail(row)}
-                                readOnly={true}
                                 value={row.memo}
-                                tabSize={4}
-                                highlight={(code) => highlight(code, languages.js)}
-                                padding={10}
-                                style={{
-                                    height: "100%",
-                                    fontFamily: "monospace",
-                                    fontSize: "12px",
+                                basicSetup={{
+                                    lineNumbers: false, // 줄 번호 표시 제거
+                                    foldGutter: false,
+                                    highlightActiveLine: false,
+                                    indentOnInput: false,
+                                    scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
+                                    scrollbarStyle: null, // 스크롤바 완전 제거
+                                    autocompletion: false, // 자동완성 비활성화
                                 }}
+                                extensions={[customEditorStyle, javascript({ jsx: true })]}
+                                theme="dark" // 다크 테마 설정
                             />
                         </div>
                     </div>
@@ -197,7 +217,7 @@ export default () => {
                 className="position-absolute"
                 style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}
             >
-                <div className="border rounded bg-dark shadow-lg">
+                <div className="border rounded bg-black shadow-lg">
                     <div className="border-bottom">
                         <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
                             <i className="bi bi-pencil-square"></i> 수정

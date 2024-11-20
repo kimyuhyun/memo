@@ -2,12 +2,22 @@ import React from "react";
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import { getAccessToken } from "../utils/common";
-import Editor from "react-simple-code-editor";
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
-import "prismjs/themes/prism.css";
 import { Link } from "react-router-dom";
+
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { EditorView } from "@codemirror/view";
+
+const customEditorStyle = EditorView.theme({
+    ".cm-scroller": {
+        // overflow: "hidden !important", // 스크롤 완전 제거
+    },
+    ".cm-content": {
+        minHeight: "500px",
+        fontFamily: "monospace",
+        fontSize: "12px",
+    },
+});
 
 var closeReadyMillSec = 0;
 
@@ -17,7 +27,7 @@ export default ({ detail, setDetail, setRefresh }) => {
     const [isStar, setStar] = useState(false);
 
     useEffect(() => {
-        editorRef.current._input.focus();
+        // editorRef.current._input.focus();
         if (detail.is_fav == 1) {
             setStar(true);
         } else {
@@ -130,7 +140,7 @@ export default ({ detail, setDetail, setRefresh }) => {
             >
                 <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content">
-                        <div className="modal-header p-0 bg-dark">
+                        <div className="modal-header p-0 bg-black" style={{ height: "50px" }}>
                             <button className="btn" type="button" onClick={(e) => handleMenu(e)}>
                                 <i className="bi bi-three-dots-vertical"></i>
                             </button>
@@ -147,24 +157,25 @@ export default ({ detail, setDetail, setRefresh }) => {
                         </div>
 
                         <div className="modal-body p-0">
-                            <div className="border bg-dark-subtle border-top-0">
-                                <Editor
-                                    ref={editorRef}
-                                    readOnly={true}
-                                    onValueChange={(code) => {
+                            <div className="border border-top-0">
+                                <CodeMirror
+                                    value={detail.memo}
+                                    basicSetup={{
+                                        lineNumbers: false, // 줄 번호 표시 제거
+                                        foldGutter: false,
+                                        highlightActiveLine: false,
+                                        indentOnInput: false,
+                                        scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
+                                        scrollbarStyle: null, // 스크롤바 완전 제거
+                                        autocompletion: false, // 자동완성 비활성화
+                                    }}
+                                    theme="dark" // 다크 테마 설정
+                                    extensions={[customEditorStyle, javascript({ jsx: true })]}
+                                    onChange={(code) => {
                                         setDetail({
                                             ...detail,
                                             memo: code,
                                         });
-                                    }}
-                                    value={detail.memo}
-                                    tabSize={4}
-                                    highlight={(code) => highlight(code, languages.js)}
-                                    padding={10}
-                                    style={{
-                                        minHeight: "500px",
-                                        fontFamily: "monospace",
-                                        fontSize: "12px",
                                     }}
                                 />
                             </div>
@@ -177,7 +188,7 @@ export default ({ detail, setDetail, setRefresh }) => {
                 className="position-absolute"
                 style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow, zIndex: 9999 }}
             >
-                <div className="border rounded bg-dark shadow-lg">
+                <div className="border rounded bg-black shadow-lg">
                     <div className="border-bottom">
                         <Link
                             className="btn text-primary"
