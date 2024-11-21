@@ -17,12 +17,12 @@ import PopupContent from "./PopupContent";
 const customEditorStyle = EditorView.theme({
     ".cm-scroller": {
         overflow: "hidden !important", // 스크롤 완전 제거
+        backgroundColor: "#000000", // 원하는 배경색
     },
     ".cm-content": {
         height: "120px",
         fontFamily: "monospace",
         fontSize: "12px",
-        backgroundColor: "#000000", // 원하는 배경색
     },
 });
 
@@ -188,6 +188,8 @@ export default () => {
                                     scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
                                     scrollbarStyle: null, // 스크롤바 완전 제거
                                     autocompletion: false, // 자동완성 비활성화
+                                    searchKeymap: false, // 검색 단축키 비활성화
+                                    search: false, // 검색 기능 비활성화
                                 }}
                                 extensions={[customEditorStyle, javascript({ jsx: true })]}
                                 theme="dark" // 다크 테마 설정

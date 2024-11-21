@@ -1,8 +1,8 @@
 import React from "react";
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { getAccessToken } from "../utils/common";
-import { Link } from "react-router-dom";
 
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
@@ -23,7 +23,6 @@ const customEditorStyle = EditorView.theme({
 var closeReadyMillSec = 0;
 
 export default ({ detail, setDetail, setRefresh }) => {
-    const editorRef = useRef(null);
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
     const [isStar, setStar] = useState(false);
 
@@ -154,7 +153,7 @@ export default ({ detail, setDetail, setRefresh }) => {
                                 <i className={`bi bi-star${isStar ? "-fill text-warning" : ""}`}></i>
                             </div>
 
-                            <button type="button" className="btn-close me-1" onClick={() => setDetail(null)}></button>
+                            <button type="button" className="btn-close me-2" onClick={() => setDetail(null)}></button>
                         </div>
 
                         <div className="modal-body p-0">
@@ -169,6 +168,8 @@ export default ({ detail, setDetail, setRefresh }) => {
                                         scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
                                         scrollbarStyle: null, // 스크롤바 완전 제거
                                         autocompletion: false, // 자동완성 비활성화
+                                        searchKeymap: false, // 검색 단축키 비활성화
+                                        search: false, // 검색 기능 비활성화
                                     }}
                                     theme="dark" // 다크 테마 설정
                                     extensions={[customEditorStyle, javascript({ jsx: true })]}
