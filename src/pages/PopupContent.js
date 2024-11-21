@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
-import { useEffect, useState, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getAccessToken } from "../utils/common";
 
 import CodeMirror from "@uiw/react-codemirror";
