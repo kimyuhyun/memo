@@ -11,6 +11,7 @@ import { EditorView } from "@codemirror/view";
 const customEditorStyle = EditorView.theme({
     ".cm-scroller": {
         // overflow: "hidden !important", // 스크롤 완전 제거
+        backgroundColor: "#000",
     },
     ".cm-content": {
         minHeight: "500px",
