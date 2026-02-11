@@ -1,16 +1,15 @@
 import React from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAccessToken } from "../utils/common";
-
+import { CopyIcon, Edit, MoreVerticalIcon, StarIcon, Trash2Icon, XIcon } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 
 const customEditorStyle = EditorView.theme({
     ".cm-scroller": {
-        // overflow: "hidden !important", // 스크롤 완전 제거
         backgroundColor: "#000",
     },
     ".cm-content": {
@@ -20,19 +19,26 @@ const customEditorStyle = EditorView.theme({
     },
 });
 
+const jsxExt = javascript({ jsx: true });
+
 var closeReadyMillSec = 0;
 
 export default ({ detail, setDetail, setRefresh }) => {
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
     const [isStar, setStar] = useState(false);
+    const [hoveredLine, setHoveredLine] = useState(null);
+    const [copyBtnPos, setCopyBtnPos] = useState({ x: 0, y: 0 });
+    const backdropRef = useRef(null);
+    const codeRef = useRef(null);
+    const editorViewRef = useRef(null);
 
     useEffect(() => {
-        // editorRef.current._input.focus();
         if (detail.is_fav == 1) {
             setStar(true);
         } else {
             setStar(false);
         }
+        backdropRef.current?.focus();
     }, []);
 
     const handleMenu = (e) => {
@@ -86,27 +92,38 @@ export default ({ detail, setDetail, setRefresh }) => {
         }
     };
 
-    const handleKeyDown = (e) => {
-        console.log(e.key);
-
-        if (e.key === "q" || e.key === "ㅂ") {
-            const nowMillSec = new Date().getTime();
-            if (nowMillSec > closeReadyMillSec + 1000) {
-                closeReadyMillSec = nowMillSec;
-                return;
-            }
-
-            if (nowMillSec <= closeReadyMillSec + 1000) {
-                setDetail(null);
-                closeReadyMillSec = 0;
-            }
-        }
+    const handleCopyLine = () => {
+        if (hoveredLine === null) return;
+        const lines = detail.memo.split("\n");
+        navigator.clipboard.writeText(lines[hoveredLine - 1] || "");
+        setHoveredLine(null);
     };
 
-    async function setFav(idx) {
-        console.log("setFav", idx);
+    const handleCursorUpdate = useCallback((update) => {
+        if (!update.selectionSet || !codeRef.current) return;
+        const view = update.view;
+        const pos = view.state.selection.main.head;
+        const line = view.state.doc.lineAt(pos);
+        if (line.from === line.to || pos < line.to) {
+            setHoveredLine(null);
+            return;
+        }
+        const endCoords = view.coordsAtPos(line.to);
+        if (!endCoords) {
+            setHoveredLine(null);
+            return;
+        }
+        setHoveredLine(line.number);
+        const containerRect = codeRef.current.getBoundingClientRect();
+        setCopyBtnPos({
+            x: endCoords.left - containerRect.left + codeRef.current.scrollLeft + 50,
+            y: endCoords.top - containerRect.top + codeRef.current.scrollTop - 6,
+        });
+    }, []);
 
-        //유용한놈!
+    const cursorExt = useMemo(() => EditorView.updateListener.of(handleCursorUpdate), [handleCursorUpdate]);
+
+    async function setFav(idx) {
         const frm = {};
         frm.idx = idx;
         const { data } = await axios({
@@ -131,77 +148,101 @@ export default ({ detail, setDetail, setRefresh }) => {
     return (
         <>
             <div
-                className="modal bg-white bg-opacity-25"
-                style={{ display: "block" }}
+                ref={backdropRef}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-white/25"
                 id="backdrop"
+                tabIndex={-1}
                 onClick={() => closeContextMenu()}
                 onDoubleClick={(e) => handleDoubleClick(e)}
-                onKeyDown={(e) => handleKeyDown(e)}
             >
-                <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
-                    <div className="modal-content">
-                        <div className="modal-header p-0 bg-black" style={{ height: "50px" }}>
-                            <button className="btn" type="button" onClick={(e) => handleMenu(e)}>
-                                <i className="bi bi-three-dots-vertical"></i>
+                <div className="w-full max-w-5xl p-4 max-lg:max-w-full max-lg:min-h-screen max-lg:m-0">
+                    <div className="bg-gray-900 border border-gray-700 rounded-lg flex flex-col w-full max-h-[90vh] overflow-hidden">
+                        <div className="flex items-center border-b border-gray-700 p-0 bg-black">
+                            <button
+                                className="px-3 py-3 rounded-full hover:bg-gray-400"
+                                type="button"
+                                onClick={(e) => handleMenu(e)}
+                            >
+                                <MoreVerticalIcon className="size-5" />
                             </button>
 
-                            <div
-                                className="ms-3 d-flex align-items-center"
-                                style={{ cursor: "pointer" }}
+                            <button
+                                className="px-3 py-3 rounded-full hover:bg-gray-400"
                                 onClick={() => setFav(detail.idx, detail.is_fav)}
                             >
-                                <i className={`bi bi-star${isStar ? "-fill text-warning" : ""}`}></i>
-                            </div>
+                                {isStar ? (
+                                    <StarIcon fill="currentColor" className="size-5 text-yellow-400" />
+                                ) : (
+                                    <StarIcon className="size-5" />
+                                )}
+                            </button>
 
-                            <button type="button" className="btn-close me-2" onClick={() => setDetail(null)}></button>
+                            <button
+                                type="button"
+                                className="ml-auto px-3 py-3 rounded-full hover:bg-gray-400"
+                                onClick={() => setDetail(null)}
+                            >
+                                <XIcon className="size-5" />
+                            </button>
                         </div>
 
-                        <div className="modal-body p-0">
-                            <div className="border border-top-0">
-                                <CodeMirror
-                                    value={detail.memo}
-                                    basicSetup={{
-                                        lineNumbers: false, // 줄 번호 표시 제거
-                                        foldGutter: false,
-                                        highlightActiveLine: false,
-                                        indentOnInput: false,
-                                        scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
-                                        scrollbarStyle: null, // 스크롤바 완전 제거
-                                        autocompletion: false, // 자동완성 비활성화
-                                        searchKeymap: false, // 검색 단축키 비활성화
-                                        search: false, // 검색 기능 비활성화
-                                    }}
-                                    theme="dark" // 다크 테마 설정
-                                    extensions={[customEditorStyle, javascript({ jsx: true })]}
-                                    onChange={(code) => {
-                                        setDetail({
-                                            ...detail,
-                                            memo: code,
-                                        });
-                                    }}
-                                />
-                            </div>
+                        <div
+                            className="flex-1 overflow-y-auto p-0 relative"
+                            ref={codeRef}
+                        >
+                            <CodeMirror
+                                value={detail.memo}
+                                readOnly={true}
+                                editable={true}
+                                basicSetup={{
+                                    lineNumbers: false,
+                                    foldGutter: false,
+                                    highlightActiveLine: false,
+                                    indentOnInput: false,
+                                    scrollPastEnd: false,
+                                    autocompletion: false,
+                                }}
+                                theme="dark"
+                                extensions={[customEditorStyle, jsxExt, cursorExt]}
+                                onCreateEditor={(view) => {
+                                    editorViewRef.current = view;
+                                }}
+                            />
+                            {hoveredLine !== null && (
+                                <button
+                                    className="absolute flex flex-row bg-gray-700 hover:bg-gray-600 text-white rounded p-1 z-10 text-xs"
+                                    style={{ top: copyBtnPos.y, left: copyBtnPos.x }}
+                                    onClick={handleCopyLine}
+                                    title="복사"
+                                >
+                                    <CopyIcon className="size-3 mr-1" /> 복사
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
             <div
-                className="position-absolute"
+                className="absolute"
                 style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow, zIndex: 9999 }}
             >
-                <div className="border rounded bg-black shadow-lg">
-                    <div className="border-bottom">
+                <div className="border rounded bg-black">
+                    <div className="border-b">
                         <Link
-                            className="btn text-primary"
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-blue-500 hover:bg-gray-400"
                             to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}`}
                         >
-                            <i className="bi bi-pencil-square"></i> 수정
+                            <Edit className="size-4 mr-2" /> 수정
                         </Link>
                     </div>
                     <div>
-                        <button className="btn text-danger" type="button" onClick={() => handleDelete(contextMenu.idx)}>
-                            <i className="bi bi-trash"></i> 삭제
+                        <button
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-red-500 hover:bg-gray-400"
+                            type="button"
+                            onClick={() => handleDelete(contextMenu.idx)}
+                        >
+                            <Trash2Icon className="size-4 mr-2" /> 삭제
                         </button>
                     </div>
                 </div>

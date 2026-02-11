@@ -1,30 +1,31 @@
 import React from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getAccessToken } from "../utils/common";
-// import Editor from "react-simple-code-editor";
-// import { highlight, languages } from "prismjs/components/prism-core";
-// import "prismjs/components/prism-clike";
-
-import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
-import { EditorView } from "@codemirror/view";
 
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import PopupContent from "./PopupContent";
+import { Edit, EditIcon, LoaderIcon, MoreVerticalIcon, StarIcon, Trash2Icon, XIcon } from "lucide-react";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { EditorView } from "@codemirror/view";
 
-const customEditorStyle = EditorView.theme({
-    ".cm-scroller": {
-        overflow: "hidden !important", // 스크롤 완전 제거
-        backgroundColor: "#000000", // 원하는 배경색
-    },
-    ".cm-content": {
-        height: "120px",
-        fontFamily: "monospace",
-        fontSize: "12px",
-    },
+const cmSetup = {
+    lineNumbers: false,
+    foldGutter: false,
+    highlightActiveLine: false,
+    indentOnInput: false,
+    scrollPastEnd: false,
+    autocompletion: false,
+};
+
+const listEditorStyle = EditorView.theme({
+    ".cm-scroller": { backgroundColor: "#000" },
+    ".cm-content": { fontFamily: "monospace", fontSize: "12px", height: "120px", overflow: "hidden" },
 });
+
+const jsxExt = javascript({ jsx: true });
 
 export default () => {
     const navigate = useNavigate();
@@ -34,10 +35,9 @@ export default () => {
     const [detail, setDetail] = useState(null);
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
     const [filter, setFilter] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const cate = searchParams.get("cate") ?? "";
-
-    // console.log(list);
 
     useEffect(() => {
         setFilter("");
@@ -59,6 +59,7 @@ export default () => {
             navigate("/Memo2/login");
             return;
         }
+        setLoading(true);
         const { data } = await axios({
             url: `${process.env.REACT_APP_HOST}/get_list?cate=${cate}`,
             method: "GET",
@@ -69,6 +70,7 @@ export default () => {
         });
         setList(data);
         setOriginList(data);
+        setLoading(false);
     };
 
     const handleDelete = async (idx) => {
@@ -95,7 +97,6 @@ export default () => {
     };
 
     const handleMenu = (e, idx) => {
-        console.log("handleMenu", e);
         e.preventDefault();
         var isShow = "none";
         if (contextMenu.isShow === "none") {
@@ -111,9 +112,6 @@ export default () => {
     };
 
     async function setFav(idx) {
-        console.log("setFav", idx);
-
-        //유용한놈!
         const frm = {};
         frm.idx = idx;
         const { data } = await axios({
@@ -125,109 +123,118 @@ export default () => {
             },
             data: frm,
         });
-        console.log(data);
 
         getList();
     }
 
+    const memoizedList = useMemo(
+        () =>
+            list.map((row) => (
+                <div key={row.idx} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 mt-1 pl-1 pr-0">
+                    <div className="flex flex-col border">
+                        <div className="flex flex-row  items-center border-b bg-gray-800" style={{ height: "50px" }}>
+                            <div
+                                className="h-[32px] px-1 flex items-center cursor-pointer rounded-full hover:bg-gray-400"
+                                onClick={() => setFav(row.idx)}
+                            >
+                                {row.is_fav == 0 ? (
+                                    <StarIcon className="size-5" />
+                                ) : (
+                                    <StarIcon fill="currentColor" className="size-5 text-yellow-400" />
+                                )}
+                            </div>
+                            <div className="flex flex-1 items-center ml-1 font-bold text-sm">
+                                {row.title} {row.exp}
+                            </div>
+                            <button
+                                className="flex items-center h-[32px] px-2 rounded-full hover:bg-gray-400"
+                                type="button"
+                                onClick={(e) => handleMenu(e, row.idx)}
+                            >
+                                <MoreVerticalIcon className="size-4" />
+                            </button>
+                        </div>
+                        <div className="overflow-hidden cursor-pointer h-[120px]" onClick={() => setDetail(row)}>
+                            <CodeMirror
+                                value={row.memo}
+                                readOnly={true}
+                                editable={false}
+                                basicSetup={cmSetup}
+                                theme="dark"
+                                extensions={[listEditorStyle, jsxExt]}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )),
+        [list],
+    );
+
     return (
-        <div className="container-fluid">
-            <div className="row pt-3 pb-1">
-                <div className="col-12 col-md-6 col-lg-6 col-xl-4 mt-1 ps-1 pe-1">
-                    <div className="input-group flex-nowrap">
+        <div className="w-full">
+            <div className="flex flex-wrap">
+                <div className="w-full md:w-1/2 lg:w-1/2 xl:w-1/3 mt-1 pl-1 pr-1">
+                    <div className="flex flex-row">
                         <input
                             type="text"
-                            className="form-control form-control-sm border-end-0 bg-dark text-white"
+                            className="w-full rounded rounded-r-none border border-gray-600 bg-gray-800 text-white px-2 py-1 text-xs focus:outline-none border-r-0"
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                         />
                         <button
-                            className="btn border border-start-0 bg-dark"
-                            style={{ zIndex: "0" }}
+                            className="px-2 py-2 rounded rounded-l-none cursor-pointer text-sm border border-l-0 bg-gray-800 hover:bg-gray-400"
                             type="button"
                             onClick={() => setFilter("")}
                         >
-                            <i className="bi bi-x-lg text-white"></i>
+                            <XIcon className="size-6" />
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="row pe-1">
-                {list.map((row, i) => (
-                    <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-2 mt-1 ps-1 pe-0">
-                        <div className="d-flex flex-column border">
-                            <div className="d-flex flex-row border-bottom bg-dark" style={{ height: "50px" }}>
-                                <div
-                                    className="ms-1 d-flex align-items-center"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => setFav(row.idx, row.is_fav)}
-                                >
-                                    <i className={`bi bi-star${row.is_fav == 0 ? "" : "-fill text-warning"}`}></i>
-                                </div>
-                                <div
-                                    className="d-flex flex-fill align-items-center ms-1 fw-bold"
-                                    style={{ fontSize: "14px" }}
-                                >
-                                    {row.title} {row.exp}
-                                </div>
-
-                                <button className="btn" type="button" onClick={(e) => handleMenu(e, row.idx)}>
-                                    <i className="bi bi-three-dots-vertical"></i>
-                                </button>
-                            </div>
-
-                            <CodeMirror
-                                onClick={() => setDetail(row)}
-                                value={row.memo}
-                                basicSetup={{
-                                    lineNumbers: false, // 줄 번호 표시 제거
-                                    foldGutter: false,
-                                    highlightActiveLine: false,
-                                    indentOnInput: false,
-                                    scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
-                                    scrollbarStyle: null, // 스크롤바 완전 제거
-                                    autocompletion: false, // 자동완성 비활성화
-                                    searchKeymap: false, // 검색 단축키 비활성화
-                                    search: false, // 검색 기능 비활성화
-                                }}
-                                extensions={[customEditorStyle, javascript({ jsx: true })]}
-                                theme="dark" // 다크 테마 설정
-                            />
-                        </div>
+            <div className="flex flex-wrap pr-1">
+                {loading && (
+                    <div className="w-full flex justify-center py-12">
+                        <LoaderIcon className="size-6 animate-spin text-gray-400" />
                     </div>
-                ))}
-                <div className="m-5"></div>
+                )}
+                {!loading && memoizedList}
+                <div className="m-12"></div>
 
-                <div
-                    className="position-fixed rounded-circle bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                    style={{ width: "50px", height: "50px", right: "20px", bottom: "20px" }}
+                <Link
+                    className={`
+                            p-5 rounded-full text-sm bg-gray-800 text-white hover:bg-gray-700
+                            fixed bottom-0 right-0 mr-4 mb-4
+                        `}
+                    to={`/Memo2?cate=${cate}&mode=write`}
                 >
-                    <Link className="btn btn-dark rounded-circle" to={`/Memo2/write?cate=${cate}`}>
-                        <i className="bi bi-pencil-square"></i>
-                    </Link>
-                </div>
+                    <EditIcon className="size-4" />
+                </Link>
             </div>
 
             <div
-                className="position-fixed bg-dark bg-opacity-50"
+                className="fixed bg-white/25"
                 style={{ width: "100vw", height: "100vh", left: 0, top: 0, display: contextMenu.isShow }}
                 onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
             ></div>
 
-            <div
-                className="position-absolute"
-                style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}
-            >
-                <div className="border rounded bg-black shadow-lg">
-                    <div className="border-bottom">
-                        <Link className="btn text-primary" to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}>
-                            <i className="bi bi-pencil-square"></i> 수정
+            <div className="absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
+                <div className="border rounded bg-black">
+                    <div className="border-b">
+                        <Link
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-blue-500 hover:bg-gray-400"
+                            to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}&mode=write`}
+                        >
+                            <Edit className="size-4 mr-2" /> 수정
                         </Link>
                     </div>
                     <div>
-                        <button className="btn text-danger" type="button" onClick={() => handleDelete(contextMenu.idx)}>
-                            <i className="bi bi-trash"></i> 삭제
+                        <button
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-red-500 hover:bg-gray-400"
+                            type="button"
+                            onClick={() => handleDelete(contextMenu.idx)}
+                        >
+                            <Trash2Icon className="size-4 mr-2" /> 삭제
                         </button>
                     </div>
                 </div>

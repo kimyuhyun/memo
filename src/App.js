@@ -1,18 +1,16 @@
 import "./css/bootstrap.icons.css";
-import "./css/bootstrap5.3.0.css";
 import axios from "axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { getAccessToken, getRefreshToken, setAccessToken } from "./utils/common";
 import { useEffect } from "react";
 
+import Layout from "./pages/Layout";
 import Main from "./pages/Main";
 import Login from "./pages/Login";
-import Write from "./pages/Write";
 import SearchResult from "./pages/SearchResult";
 import Setting from "./pages/Setting";
 import NotFound from "./pages/NotFound";
 import FileRoom from "./pages/FileRoom";
-import EditorTest from "./pages/EditorTest";
 
 console.log(process.env.NODE_ENV);
 
@@ -48,7 +46,7 @@ axios.interceptors.response.use(
         // 오류 응답을 처리
         // ...
         return Promise.reject(error);
-    }
+    },
 );
 
 export default () => {
@@ -67,14 +65,14 @@ export default () => {
 
     return (
         <Routes>
-            <Route path="/Memo2" element={<Main />}></Route>
-            <Route path="/Memo2/login" element={<Login />}></Route>
-            <Route path="/Memo2/write" element={<Write />}></Route>
-            <Route path="/Memo2/search" element={<SearchResult />}></Route>
-            <Route path="/Memo2/setting" element={<Setting />}></Route>
-            <Route path="/Memo2/file_room" element={<FileRoom />}></Route>
-            <Route path="/Memo2/editor_test" element={<EditorTest />}></Route>
-            <Route path="*" element={<NotFound />}></Route>
+            <Route path="/Memo2/login" element={<Login />} />
+            <Route path="/Memo2" element={<Layout />}>
+                <Route index element={<Main />} />
+                <Route path="search" element={<SearchResult />} />
+                <Route path="setting" element={<Setting />} />
+                <Route path="file_room" element={<FileRoom />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 };

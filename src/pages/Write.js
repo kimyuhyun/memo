@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { getAccessToken, getId, getRefreshToken } from "../utils/common";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
-
+import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 
 const customEditorStyle = EditorView.theme({
     ".cm-scroller": {
-        // overflow: "hidden !important", // 스크롤 완전 제거
         backgroundColor: "#000",
     },
     ".cm-content": {
@@ -87,12 +86,13 @@ export default () => {
     return (
         <div className="">
             <form id="frm1" onSubmit={handleSubmit}>
-                <div className="d-flex flex-row align-items-center">
-                    <button className="btn btn-lg me-auto m-3" type="button" onClick={() => navigate(-1)}>
-                        <i className="bi bi-arrow-left"></i>
+                <div className="flex flex-row justify-between">
+                    <button className="text-white rounded-full hover:bg-gray-400 p-6" onClick={(e) => navigate(-1)}>
+                        <ArrowLeftIcon className="size-6" />
                     </button>
-                    <button className="btn btn-primary btn-lg m-3" type="submit">
-                        <i className="bi bi-check-lg"></i>
+
+                    <button type="submit" className="text-white rounded-full hover:bg-gray-400 p-6">
+                        <CheckIcon className="size-6" />
                     </button>
                 </div>
 
@@ -100,31 +100,31 @@ export default () => {
                 <input type="hidden" name="cate" value={cate} />
                 <input type="hidden" name="table" value="MEMO_ARTICLE_tbl" />
 
-                <div className="mb-3 mx-3">
+                <div className="mb-4 mx-4">
                     <input
                         type="text"
-                        className="border form-control bg-black"
+                        className="block w-full rounded border border-gray-600 bg-black text-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
                 </div>
 
-                <div className="mb-3 mx-3 pb-5 border">
+                <div className="mb-4 mx-4 pb-12 border">
                     <CodeMirror
                         value={memo}
                         basicSetup={{
-                            lineNumbers: false, // 줄 번호 표시 제거
+                            lineNumbers: false,
                             foldGutter: false,
                             highlightActiveLine: false,
                             indentOnInput: false,
-                            scrollPastEnd: false, // 문서 끝을 넘어서는 스크롤 방지
-                            scrollbarStyle: null, // 스크롤바 완전 제거
-                            autocompletion: false, // 자동완성 비활성화
-                            searchKeymap: false, // 검색 단축키 비활성화
-                            search: false, // 검색 기능 비활성화
+                            scrollPastEnd: false,
+                            scrollbarStyle: null,
+                            autocompletion: false,
+                            searchKeymap: false,
+                            search: false,
                         }}
-                        theme="dark" // 다크 테마 설정
+                        theme="dark"
                         extensions={[customEditorStyle, javascript({ jsx: true })]}
                         onChange={(code) => {
                             setMemo(code);
