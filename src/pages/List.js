@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { getAccessToken } from "../utils/common";
@@ -21,11 +21,47 @@ const cmSetup = {
 };
 
 const listEditorStyle = EditorView.theme({
-    ".cm-scroller": { backgroundColor: "#000" },
+    ".cm-scroller": { backgroundColor: "#000", overflow: "hidden" },
     ".cm-content": { fontFamily: "monospace", fontSize: "12px", height: "120px", overflow: "hidden" },
 });
 
 const jsxExt = javascript({ jsx: true });
+
+const LazyCodeMirror = ({ value, onClick }) => {
+    const ref = useRef(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) setVisible(true);
+            },
+            { rootMargin: "200px" }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={ref} className="overflow-hidden cursor-pointer h-[120px]" onClick={onClick}>
+            {visible ? (
+                <CodeMirror
+                    value={value}
+                    readOnly={true}
+                    editable={false}
+                    basicSetup={cmSetup}
+                    theme="dark"
+                    extensions={[listEditorStyle, jsxExt]}
+                />
+            ) : (
+                <pre className="bg-black text-white text-xs font-mono p-2 m-0 h-full">{value}</pre>
+            )}
+        </div>
+    );
+};
+const listCache = new Map();
 
 export default () => {
     const navigate = useNavigate();
@@ -59,7 +95,15 @@ export default () => {
             navigate("/Memo2/login");
             return;
         }
-        setLoading(true);
+
+        const cached = listCache.get(cate);
+        if (cached) {
+            setList(cached);
+            setOriginList(cached);
+        } else {
+            setLoading(true);
+        }
+
         const { data } = await axios({
             url: `${process.env.REACT_APP_HOST}/get_list?cate=${cate}`,
             method: "GET",
@@ -68,6 +112,7 @@ export default () => {
                 Authorization: `Bearer ${getAccessToken()}`,
             },
         });
+        listCache.set(cate, data);
         setList(data);
         setOriginList(data);
         setLoading(false);
@@ -154,16 +199,7 @@ export default () => {
                                 <MoreVerticalIcon className="size-4" />
                             </button>
                         </div>
-                        <div className="overflow-hidden cursor-pointer h-[120px]" onClick={() => setDetail(row)}>
-                            <CodeMirror
-                                value={row.memo}
-                                readOnly={true}
-                                editable={false}
-                                basicSetup={cmSetup}
-                                theme="dark"
-                                extensions={[listEditorStyle, jsxExt]}
-                            />
-                        </div>
+                        <LazyCodeMirror value={row.memo} onClick={() => setDetail(row)} />
                     </div>
                 </div>
             )),
@@ -172,7 +208,7 @@ export default () => {
 
     return (
         <div className="w-full">
-            <div className="flex flex-wrap">
+            <div className="flex flex-wrap my-2">
                 <div className="w-full md:w-1/2 lg:w-1/2 xl:w-1/3 mt-1 pl-1 pr-1">
                     <div className="flex flex-row">
                         <input
