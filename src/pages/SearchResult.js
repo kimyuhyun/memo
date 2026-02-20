@@ -30,6 +30,7 @@ export default () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const keyword = searchParams.get("keyword") ?? "";
+
     const [list, setList] = useState([]);
     const [cate, setCate] = useState("");
     const [detail, setDetail] = useState(null);
@@ -37,6 +38,8 @@ export default () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        console.log(keyword);
+
         (async () => {
             if ((await isPossibleToken()) === -1) {
                 navigate("/Memo2/login");
@@ -47,7 +50,7 @@ export default () => {
         if (keyword !== "") {
             getSearchResult();
         }
-    }, []);
+    }, [keyword]);
 
     const getSearchResult = async () => {
         setLoading(true);
@@ -157,7 +160,12 @@ export default () => {
                             </div>
                         </div>
                     ))}
-                <div className="m-12"></div>
+
+                {!loading && list.length === 0 && (
+                    <div className="w-full flex justify-center py-12">
+                        <div className="text-gray-400">검색 결과가 없습니다.</div>
+                    </div>
+                )}
             </div>
 
             <div
