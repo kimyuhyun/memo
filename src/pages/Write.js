@@ -80,14 +80,14 @@ export default () => {
             data: frm,
         });
         console.log(data);
-        navigate(-1);
+        navigate(`/Memo2?cate=${cate}`);
     };
 
     return (
         <div className="">
             <form id="frm1" onSubmit={handleSubmit}>
                 <div className="flex flex-row justify-between">
-                    <button className="text-white rounded-full hover:bg-gray-400 p-6" onClick={(e) => navigate(-1)}>
+                    <button className="text-white rounded-full hover:bg-gray-400 p-6" onClick={(e) => navigate(`/Memo2?cate=${cate}`)}>
                         <ArrowLeftIcon className="size-6" />
                     </button>
 

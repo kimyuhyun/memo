@@ -186,13 +186,10 @@ export default ({ detail, setDetail, setRefresh }) => {
                             </button>
                         </div>
 
-                        <div
-                            className="flex-1 overflow-y-auto p-0 relative"
-                            ref={codeRef}
-                        >
+                        <div className="flex-1 overflow-y-auto p-0 relative" ref={codeRef}>
                             <CodeMirror
                                 value={detail.memo}
-                                readOnly={true}
+                                readOnly={false}
                                 editable={true}
                                 basicSetup={{
                                     lineNumbers: false,
@@ -231,9 +228,9 @@ export default ({ detail, setDetail, setRefresh }) => {
                     <div className="border-b">
                         <Link
                             className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-blue-500 hover:bg-gray-400"
-                            to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}`}
+                            to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}&mode=edit`}
                         >
-                            <Edit className="size-4 mr-2" /> 수정
+                            <Edit className="size-4 mr-2" /> 수정2
                         </Link>
                     </div>
                     <div>
