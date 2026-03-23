@@ -94,8 +94,9 @@ export default ({ detail, setDetail, setRefresh }) => {
 
     const handleCopyLine = () => {
         if (hoveredLine === null) return;
-        const lines = detail.memo.split("\n");
-        navigator.clipboard.writeText(lines[hoveredLine - 1] || "");
+        const doc = editorViewRef.current?.state?.doc;
+        const text = doc ? doc.line(hoveredLine).text : (detail.memo.split("\n")[hoveredLine - 1] || "");
+        navigator.clipboard.writeText(text);
         setHoveredLine(null);
     };
 
