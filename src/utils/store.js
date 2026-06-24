@@ -11,6 +11,9 @@ export const isPossibleToken = async () => {
         },
     });
 
+    console.log(data);
+    
+
     if (data.access_token) {
         setAccessToken(data.access_token);
     }

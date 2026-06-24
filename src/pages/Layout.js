@@ -13,6 +13,7 @@ export default () => {
     const [cateList, setCateList] = useState([]);
     const [isSearchPopup, setIsSearchPopup] = useState(false);
     const cate = searchParams.get("cate") ?? "";
+    const mode = searchParams.get("mode") ?? "";
 
     const location = useLocation();
     const [lastSegment, setLastSegment] = useState("");
@@ -27,7 +28,7 @@ export default () => {
 
     const getCate = async () => {
         if ((await isPossibleToken()) === -1) {
-            navigate("/Memo2/login");
+            // navigate("/Memo2/login");
             return;
         }
 
@@ -70,7 +71,7 @@ export default () => {
         <>
             <div className="flex flex-col h-screen">
                 {/* 상단 탭 메뉴 */}
-                <div className="flex flex-wrap bg-black">
+                <div className={`flex flex-wrap bg-black ${mode !== "" ? "hidden" : ""}`}>
                     <button
                         className="px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 cursor-pointer whitespace-nowrap"
                         onClick={(e) => {

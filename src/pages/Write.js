@@ -10,11 +10,14 @@ import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 
 const customEditorStyle = EditorView.theme({
+    "&": {
+        height: "100%",
+    },
     ".cm-scroller": {
         backgroundColor: "#000",
+        overflow: "auto",
     },
     ".cm-content": {
-        minHeight: "500px",
         fontFamily: "monospace",
         fontSize: "12px",
     },
@@ -84,42 +87,49 @@ export default () => {
     };
 
     return (
-        <div className="">
-            <form id="frm1" onSubmit={handleSubmit}>
-                <div className="flex flex-row justify-between">
-                    <button className="text-white rounded-full hover:bg-gray-400 p-6" onClick={(e) => navigate(`/Memo2?cate=${cate}`)}>
-                        <ArrowLeftIcon className="size-6" />
-                    </button>
+        <div className="bg-black h-screen overflow-hidden">
+            <form id="frm1" onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+                <div className="flex flex-col">
+                    <div className="flex flex-row justify-between">
+                        <button
+                            className="text-white rounded-full hover:bg-gray-400 p-6"
+                            onClick={(e) => navigate(`/Memo2?cate=${cate}`)}
+                        >
+                            <ArrowLeftIcon className="size-6" />
+                        </button>
 
-                    <button type="submit" className="text-white rounded-full hover:bg-gray-400 p-6">
-                        <CheckIcon className="size-6" />
-                    </button>
+                        <button type="submit" className="text-white rounded-full hover:bg-gray-400 p-6">
+                            <CheckIcon className="size-6" />
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="idx" value={idx} />
+                    <input type="hidden" name="cate" value={cate} />
+                    <input type="hidden" name="table" value="MEMO_ARTICLE_tbl" />
+
+                    <div className="mb-4 mx-4">
+                        <input
+                            type="text"
+                            className="block w-full rounded border border-gray-600 bg-gray-900 text-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            required
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                    </div>
                 </div>
 
-                <input type="hidden" name="idx" value={idx} />
-                <input type="hidden" name="cate" value={cate} />
-                <input type="hidden" name="table" value="MEMO_ARTICLE_tbl" />
-
-                <div className="mb-4 mx-4">
-                    <input
-                        type="text"
-                        className="block w-full rounded border border-gray-600 bg-black text-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        required
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                </div>
-
-                <div className="mb-4 mx-4 pb-12 border">
+                <div className="mb-4 mx-4 border flex-1 min-h-0">
                     <CodeMirror
                         value={memo}
+                        height="100%"
+                        className="h-full"
                         basicSetup={{
                             lineNumbers: false,
                             foldGutter: false,
                             highlightActiveLine: false,
                             indentOnInput: false,
-                            scrollPastEnd: false,
-                            scrollbarStyle: null,
+                            scrollPastEnd: true,
+                            scrollbarStyle: true,
                             autocompletion: false,
                             searchKeymap: false,
                             search: false,

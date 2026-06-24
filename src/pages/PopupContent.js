@@ -95,7 +95,7 @@ export default ({ detail, setDetail, setRefresh }) => {
     const handleCopyLine = () => {
         if (hoveredLine === null) return;
         const doc = editorViewRef.current?.state?.doc;
-        const text = doc ? doc.line(hoveredLine).text : (detail.memo.split("\n")[hoveredLine - 1] || "");
+        const text = doc ? doc.line(hoveredLine).text : detail.memo.split("\n")[hoveredLine - 1] || "";
         navigator.clipboard.writeText(text);
         setHoveredLine(null);
     };
@@ -231,7 +231,7 @@ export default ({ detail, setDetail, setRefresh }) => {
                             className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-blue-500 hover:bg-gray-400"
                             to={`/Memo2?idx=${contextMenu.idx}&cate=${contextMenu.cate}&mode=edit`}
                         >
-                            <Edit className="size-4 mr-2" /> 수정2
+                            <Edit className="size-4 mr-2" /> 수정
                         </Link>
                     </div>
                     <div>
