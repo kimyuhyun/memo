@@ -1,3 +1,4 @@
+import { showConfirm } from "../components/Alert";
 import React from "react";
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "../utils/common";
@@ -111,7 +112,7 @@ export default () => {
     };
 
     const handleDelete = async (idx) => {
-        if (window.confirm("삭제하시겠습니까?")) {
+        if (await showConfirm("삭제하시겠습니까?")) {
             const { data } = await axios({
                 url: `${process.env.REACT_APP_HOST}/write`,
                 method: "POST",

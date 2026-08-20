@@ -1,3 +1,4 @@
+import { showAlert } from "../components/Alert";
 import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -41,7 +42,7 @@ export default () => {
         })();
 
         if (cate === "") {
-            alert("카테고리를 선택해주세요.");
+            showAlert("카테고리를 선택해주세요.");
             navigate("/Memo2");
         }
 
@@ -92,8 +93,9 @@ export default () => {
                 <div className="flex flex-col">
                     <div className="flex flex-row justify-between">
                         <button
+                            type="button"
                             className="text-white rounded-full hover:bg-gray-400 p-6"
-                            onClick={(e) => navigate(`/Memo2?cate=${cate}`)}
+                            onClick={(e) => navigate(-1)}
                         >
                             <ArrowLeftIcon className="size-6" />
                         </button>

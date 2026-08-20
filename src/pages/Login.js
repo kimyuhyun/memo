@@ -1,3 +1,4 @@
+import { showAlert } from "../components/Alert";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
@@ -38,7 +39,7 @@ export default () => {
             setId(frm.email);
             navigate("/Memo2");
         } else {
-            alert(data.msg);
+            showAlert(data.msg);
         }
     };
 
@@ -54,7 +55,7 @@ export default () => {
                         <span className="flex items-center px-3 bg-gray-700 text-gray-300 border border-gray-600 text-sm">
                             <i className="bi bi-envelope"></i>
                         </span>
-                        <input className="block w-full rounded border border-gray-600 bg-gray-900 text-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" ref={inputEmail} type="text" name="email" placeholder="이메일" required />
+                        <input className="block w-full rounded border border-gray-600 bg-gray-900 text-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" ref={inputEmail} type="email" name="email" placeholder="이메일" required />
                     </div>
 
                     <div className="flex pw">

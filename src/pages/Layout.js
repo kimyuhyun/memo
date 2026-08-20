@@ -5,7 +5,7 @@ import { getAccessToken } from "../utils/common";
 import { useNavigate, Link, useSearchParams, Outlet, useLocation } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import SearchPopup from "./SearchPopup";
-import { HardDriveIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { HardDriveIcon, PaletteIcon, SearchIcon, SettingsIcon } from "lucide-react";
 
 export default () => {
     const navigate = useNavigate();
@@ -123,6 +123,19 @@ export default () => {
                     >
                         <HardDriveIcon className="size-4" />
                     </Link>
+
+                    <Link
+                        className={`
+                            rounded
+                            px-3 py-2 text-sm
+                            hover:text-white hover:bg-blue-500
+                            ${lastSegment == `color_picker` ? `text-white bg-blue-500` : `text-gray-400`}
+                        `}
+                        to="/Memo2/color_picker"
+                    >
+                        <PaletteIcon className="size-4" />
+                    </Link>
+
                 </div>
 
                 {/* 메인 콘텐츠 */}

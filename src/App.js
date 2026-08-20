@@ -11,6 +11,8 @@ import SearchResult from "./pages/SearchResult";
 import Setting from "./pages/Setting";
 import NotFound from "./pages/NotFound";
 import FileRoom from "./pages/FileRoom";
+import ColorPicker from "./pages/ColorPicker";
+import AlertHost from "./components/Alert";
 
 console.log(process.env.NODE_ENV);
 
@@ -64,6 +66,8 @@ export default () => {
     }, []);
 
     return (
+        <>
+        <AlertHost />
         <Routes>
             <Route path="/Memo2/login" element={<Login />} />
             <Route path="/Memo2" element={<Layout />}>
@@ -71,8 +75,10 @@ export default () => {
                 <Route path="search" element={<SearchResult />} />
                 <Route path="setting" element={<Setting />} />
                 <Route path="file_room" element={<FileRoom />} />
+                <Route path="color_picker" element={<ColorPicker />} />
             </Route>
             <Route path="*" element={<NotFound />} />
         </Routes>
+        </>
     );
 };

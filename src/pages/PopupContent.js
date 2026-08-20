@@ -1,3 +1,4 @@
+import { showAlert, showConfirm } from "../components/Alert";
 import React from "react";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,10 +28,12 @@ export default ({ detail, setDetail, setRefresh }) => {
     const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, idx: 0, isShow: "none" });
     const [isStar, setStar] = useState(false);
     const [hoveredLine, setHoveredLine] = useState(null);
-    const [copyBtnPos, setCopyBtnPos] = useState({ x: 0, y: 0 });
+    const [isCopied, setCopied] = useState(false);
     const backdropRef = useRef(null);
     const codeRef = useRef(null);
     const editorViewRef = useRef(null);
+    const copyTimeoutRef = useRef(null);
+    const [isMobile] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
     useEffect(() => {
         if (detail.is_fav == 1) {
@@ -58,7 +61,7 @@ export default ({ detail, setDetail, setRefresh }) => {
     };
 
     const handleDelete = async (idx) => {
-        if (window.confirm("삭제하시겠습니까?")) {
+        if (await showConfirm("삭제하시겠습니까?")) {
             const { data } = await axios({
                 url: `${process.env.REACT_APP_HOST}/del`,
                 method: "POST",
@@ -72,7 +75,7 @@ export default ({ detail, setDetail, setRefresh }) => {
                 },
             });
             if (data.code === 0) {
-                alert(data.msg);
+                showAlert(data.msg);
             }
 
             setRefresh();
@@ -92,34 +95,53 @@ export default ({ detail, setDetail, setRefresh }) => {
         }
     };
 
+    const copyTextToClipboard = (text) => {
+        if (navigator.clipboard) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise((resolve, reject) => {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand("copy") ? resolve() : reject();
+            } catch (err) {
+                reject(err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        });
+    };
+
     const handleCopyLine = () => {
         if (hoveredLine === null) return;
         const doc = editorViewRef.current?.state?.doc;
         const text = doc ? doc.line(hoveredLine).text : detail.memo.split("\n")[hoveredLine - 1] || "";
-        navigator.clipboard.writeText(text);
-        setHoveredLine(null);
+        copyTextToClipboard(text)
+            .then(() => {
+                setCopied(true);
+                clearTimeout(copyTimeoutRef.current);
+                copyTimeoutRef.current = setTimeout(() => {
+                    setCopied(false);
+                    setHoveredLine(null);
+                }, 2000);
+            })
+            .catch((err) => {
+                console.error(err);
+                showAlert("복사 실패");
+            });
     };
 
     const handleCursorUpdate = useCallback((update) => {
-        if (!update.selectionSet || !codeRef.current) return;
-        const view = update.view;
-        const pos = view.state.selection.main.head;
-        const line = view.state.doc.lineAt(pos);
-        if (line.from === line.to || pos < line.to) {
-            setHoveredLine(null);
-            return;
-        }
-        const endCoords = view.coordsAtPos(line.to);
-        if (!endCoords) {
-            setHoveredLine(null);
-            return;
-        }
+        if (!update.selectionSet) return;
+        const pos = update.view.state.selection.main.head;
+        const line = update.view.state.doc.lineAt(pos);
         setHoveredLine(line.number);
-        const containerRect = codeRef.current.getBoundingClientRect();
-        setCopyBtnPos({
-            x: endCoords.left - containerRect.left + codeRef.current.scrollLeft + 50,
-            y: endCoords.top - containerRect.top + codeRef.current.scrollTop - 6,
-        });
     }, []);
 
     const cursorExt = useMemo(() => EditorView.updateListener.of(handleCursorUpdate), [handleCursorUpdate]);
@@ -156,8 +178,8 @@ export default ({ detail, setDetail, setRefresh }) => {
                 onClick={() => closeContextMenu()}
                 onDoubleClick={(e) => handleDoubleClick(e)}
             >
-                <div className="w-full max-w-5xl p-4 max-lg:max-w-full max-lg:min-h-screen max-lg:m-0">
-                    <div className="bg-gray-900 border border-gray-700 rounded-lg flex flex-col w-full max-h-[90vh] overflow-hidden">
+                <div className="w-full max-w-5xl p-4 max-lg:max-w-full max-lg:h-dvh max-lg:p-0 max-lg:m-0">
+                    <div className="bg-gray-900 border border-gray-700 rounded-lg flex flex-col w-full max-h-[90vh] overflow-hidden max-lg:h-full max-lg:max-h-full max-lg:rounded-none max-lg:border-0">
                         <div className="flex items-center border-b border-gray-700 p-0 bg-black">
                             <button
                                 className="px-3 py-3 rounded-full hover:bg-gray-400"
@@ -178,6 +200,18 @@ export default ({ detail, setDetail, setRefresh }) => {
                                 )}
                             </button>
 
+                            <div className="flex flex-1 justify-center">
+                                {hoveredLine !== null && (
+                                    <button
+                                        className="flex flex-row bg-gray-700 hover:bg-gray-600 text-white rounded p-2 z-10 text-xs"
+                                        onClick={handleCopyLine}
+                                        title="복사"
+                                    >
+                                        {isCopied ? "복사됨" : `포커스된 ${hoveredLine}번째 라인 복사`}
+                                    </button>
+                                )}
+                            </div>
+
                             <button
                                 type="button"
                                 className="ml-auto px-3 py-3 rounded-full hover:bg-gray-400"
@@ -190,8 +224,8 @@ export default ({ detail, setDetail, setRefresh }) => {
                         <div className="flex-1 overflow-y-auto p-0 relative" ref={codeRef}>
                             <CodeMirror
                                 value={detail.memo}
-                                readOnly={false}
-                                editable={true}
+                                readOnly={isMobile}
+                                editable={!isMobile}
                                 basicSetup={{
                                     lineNumbers: false,
                                     foldGutter: false,
@@ -206,16 +240,6 @@ export default ({ detail, setDetail, setRefresh }) => {
                                     editorViewRef.current = view;
                                 }}
                             />
-                            {hoveredLine !== null && (
-                                <button
-                                    className="absolute flex flex-row bg-gray-700 hover:bg-gray-600 text-white rounded p-1 z-10 text-xs"
-                                    style={{ top: copyBtnPos.y, left: copyBtnPos.x }}
-                                    onClick={handleCopyLine}
-                                    title="복사"
-                                >
-                                    <CopyIcon className="size-3 mr-1" /> 복사
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

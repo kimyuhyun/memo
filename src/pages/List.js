@@ -1,3 +1,4 @@
+import { showAlert, showConfirm } from "../components/Alert";
 import React, { useRef } from "react";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
@@ -38,7 +39,7 @@ const LazyCodeMirror = ({ value, onClick }) => {
             ([entry]) => {
                 if (entry.isIntersecting) setVisible(true);
             },
-            { rootMargin: "200px" }
+            { rootMargin: "200px" },
         );
         observer.observe(el);
         return () => observer.disconnect();
@@ -119,7 +120,7 @@ export default () => {
     };
 
     const handleDelete = async (idx) => {
-        if (window.confirm("삭제하시겠습니까?")) {
+        if (await showConfirm("삭제하시겠습니까?")) {
             const { data } = await axios({
                 url: `${process.env.REACT_APP_HOST}/del`,
                 method: "POST",
@@ -133,7 +134,7 @@ export default () => {
                 },
             });
             if (data.code === 0) {
-                alert(data.msg);
+                showAlert(data.msg);
             }
             getList();
 
@@ -179,7 +180,7 @@ export default () => {
                     <div className="flex flex-col border">
                         <div className="flex flex-row  items-center border-b bg-gray-800" style={{ height: "50px" }}>
                             <div
-                                className="h-[32px] px-1 flex items-center cursor-pointer rounded-full hover:bg-gray-400"
+                                className="w-[40px] h-[40px] flex items-center justify-center cursor-pointer rounded-full hover:bg-gray-400"
                                 onClick={() => setFav(row.idx)}
                             >
                                 {row.is_fav == 0 ? (
@@ -192,7 +193,7 @@ export default () => {
                                 {row.title} {row.exp}
                             </div>
                             <button
-                                className="flex items-center h-[32px] px-2 rounded-full hover:bg-gray-400"
+                                className="flex items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-gray-400"
                                 type="button"
                                 onClick={(e) => handleMenu(e, row.idx)}
                             >

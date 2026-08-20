@@ -1,3 +1,4 @@
+import { showAlert, showConfirm } from "../components/Alert";
 import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { getAccessToken, getId, getRefreshToken } from "../utils/common";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { isPossibleToken } from "../utils/store";
 import PopupContent from "./PopupContent";
-import { ArrowLeftIcon, LoaderIcon } from "lucide-react";
+import { ArrowLeftIcon, Edit, LoaderIcon, Trash2Icon } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
@@ -67,7 +68,7 @@ export default () => {
     };
 
     const handleDelete = async (idx) => {
-        if (window.confirm("삭제하시겠습니까?")) {
+        if (await showConfirm("삭제하시겠습니까?")) {
             const { data } = await axios({
                 url: `${process.env.REACT_APP_HOST}/del`,
                 method: "POST",
@@ -81,7 +82,7 @@ export default () => {
                 },
             });
             if (data.code === 0) {
-                alert(data.msg);
+                showAlert(data.msg);
             }
             getSearchResult();
 
@@ -126,13 +127,13 @@ export default () => {
                     list.map((row, i) => (
                         <div key={i} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 mt-1 pl-1 pr-0">
                             <div className="flex flex-col border">
-                                <div className="flex flex-row border-b bg-gray-800" style={{ height: "50px" }}>
+                                <div className="flex flex-row items-center border-b bg-gray-800" style={{ height: "50px" }}>
                                     <div className="flex flex-1 items-center ml-2 font-bold">
                                         {row.title} {row.exp}
                                     </div>
 
                                     <button
-                                        className="inline-flex items-center justify-center px-3 py-1.5 rounded cursor-pointer border border-transparent text-sm transition-colors text-gray-300"
+                                        className="flex inline-flex items-center justify-center w-[40px] h-[40px] rounded-full cursor-pointer border border-transparent text-sm transition-colors text-gray-300 hover:text-white hover:bg-gray-400"
                                         type="button"
                                         onClick={(e) => {
                                             handleMenu(e, row.idx);
@@ -169,28 +170,28 @@ export default () => {
             </div>
 
             <div
-                className="fixed bg-gray-800/50"
+                className="fixed bg-white/25"
                 style={{ width: "100vw", height: "100vh", left: 0, top: 0, display: contextMenu.isShow }}
                 onClick={() => setContextMenu({ ...contextMenu, isShow: "none" })}
             ></div>
 
             <div className="absolute" style={{ left: contextMenu.x, top: contextMenu.y, display: contextMenu.isShow }}>
-                <div className="border rounded bg-white shadow-lg">
+                <div className="border rounded bg-black">
                     <div className="border-b">
                         <Link
-                            className="inline-flex items-center justify-center px-3 py-1.5 rounded cursor-pointer border border-transparent text-sm transition-colors text-blue-500"
-                            to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}`}
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-blue-500 hover:bg-gray-400"
+                            to={`/Memo2?idx=${contextMenu.idx}&cate=${cate}&mode=edit`}
                         >
-                            <i className="bi bi-pencil-square"></i> 수정
+                            <Edit className="size-4 mr-2" /> 수정
                         </Link>
                     </div>
                     <div>
                         <button
-                            className="inline-flex items-center justify-center px-3 py-1.5 rounded cursor-pointer border border-transparent text-sm transition-colors text-red-500"
+                            className="flex items-center justify-center px-4 py-2 rounded cursor-pointer text-red-500 hover:bg-gray-400"
                             type="button"
                             onClick={() => handleDelete(contextMenu.idx)}
                         >
-                            <i className="bi bi-trash"></i> 삭제
+                            <Trash2Icon className="size-4 mr-2" /> 삭제
                         </button>
                     </div>
                 </div>
